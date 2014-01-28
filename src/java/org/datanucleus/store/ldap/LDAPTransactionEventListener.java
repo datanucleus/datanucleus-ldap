@@ -30,8 +30,8 @@ import org.datanucleus.util.Localiser;
 public class LDAPTransactionEventListener implements TransactionEventListener
 {
     /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.store.ldap.Localisation", LDAPStoreManager.class
-            .getClassLoader());
+    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.store.ldap.Localisation", 
+        LDAPStoreManager.class.getClassLoader());
 
     Set<Object> objectsToPersist = new HashSet<Object>();
 
@@ -65,21 +65,10 @@ public class LDAPTransactionEventListener implements TransactionEventListener
         objectsToPersist.add(pc);
     }
 
-    public void transactionStarted()
-    {
-    }
-
-    public void transactionEnded()
-    {
-    }
-
-    public void transactionPreFlush()
-    {
-    }
-
-    public void transactionFlushed()
-    {
-    }
+    public void transactionStarted() {}
+    public void transactionEnded() {}
+    public void transactionPreFlush() {}
+    public void transactionFlushed() {}
 
     public void transactionPreCommit()
     {
@@ -98,15 +87,10 @@ public class LDAPTransactionEventListener implements TransactionEventListener
         ec.deleteObjects(objectsToDelete.toArray());
     }
 
-    public void transactionCommitted()
-    {
-    }
-
-    public void transactionPreRollBack()
-    {
-    }
-
-    public void transactionRolledBack()
-    {
-    }
+    public void transactionCommitted() {}
+    public void transactionPreRollBack() {}
+    public void transactionRolledBack() {}
+    public void transactionSetSavepoint(String name) {}
+    public void transactionReleaseSavepoint(String name) {}
+    public void transactionRollbackToSavepoint(String name) {}
 }
