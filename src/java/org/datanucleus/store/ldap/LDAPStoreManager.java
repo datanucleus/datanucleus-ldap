@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.flush.FlushOrdered;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.store.AbstractStoreManager;
@@ -42,7 +42,7 @@ public class LDAPStoreManager extends AbstractStoreManager
      * @param ctx context
      * @param props Properties for the datastore
      */
-    public LDAPStoreManager(ClassLoaderResolver clr, NucleusContext ctx, Map<String, Object> props)
+    public LDAPStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
     {
         super("ldap", clr, ctx, props);
 
