@@ -31,6 +31,7 @@ import javax.naming.ldap.LdapContext;
 import javax.transaction.xa.XAResource;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -64,7 +65,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         ldapEnv.put(Context.PROVIDER_URL, storeMgr.getConnectionURL());
         ldapEnv.put(Context.SECURITY_PRINCIPAL, storeMgr.getConnectionUserName());
         ldapEnv.put(Context.SECURITY_CREDENTIALS, storeMgr.getConnectionPassword());
-        if ("JNDI".equals(storeMgr.getStringProperty("datanucleus.connectionPoolingType")))
+        if ("JNDI".equalsIgnoreCase(storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE)))
         {
             ldapEnv.put("com.sun.jndi.ldap.connect.pool", "true");
             // System.setProperty("com.sun.jndi.ldap.connect.pool.debug", "fine");
