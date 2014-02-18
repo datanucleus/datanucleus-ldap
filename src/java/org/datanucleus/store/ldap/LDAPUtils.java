@@ -1063,7 +1063,6 @@ public class LDAPUtils
      * level in the hierarchy. Set to true and it will look to the database.
      * @return Object
      */
-    @SuppressWarnings("deprecation")
     protected static Object findObjectUsingAID(ExecutionContext ec, Class pcCls, final FieldValues fv,
             boolean ignoreCache, boolean checkInheritance)
     {
