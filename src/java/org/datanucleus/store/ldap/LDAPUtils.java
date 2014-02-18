@@ -1067,7 +1067,7 @@ public class LDAPUtils
             boolean ignoreCache, boolean checkInheritance)
     {
         // Create ObjectProvider to generate an identity NOTE THIS IS VERY INEFFICIENT
-        ObjectProvider op = (ObjectProvider) ec.newObjectProviderForHollowPopulatedAppId(pcCls, fv);
+        ObjectProvider op = ec.getNucleusContext().getObjectProviderFactory().newForHollowPopulatedAppId(ec, pcCls, fv);
         if (!ignoreCache)
         {
             // Check the cache
