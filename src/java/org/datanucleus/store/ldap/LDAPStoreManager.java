@@ -77,6 +77,7 @@ public class LDAPStoreManager extends AbstractStoreManager
         set.add(StoreManager.OPTION_APPLICATION_ID);
         set.add(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED);
         set.add(StoreManager.OPTION_ORM);
+        set.add(StoreManager.OPTION_ORM_EMBEDDED_PC);
         return set;
     }
 }
