@@ -28,6 +28,7 @@ import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.flush.FlushOrdered;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.store.AbstractStoreManager;
+import org.datanucleus.store.StoreManager;
 
 /**
  * Manager for LDAP datastores.
@@ -73,9 +74,9 @@ public class LDAPStoreManager extends AbstractStoreManager
     public Collection getSupportedOptions()
     {
         Set set = new HashSet();
-        set.add("ApplicationIdentity");
-        set.add("TransactionIsolationLevel.read-committed");
-        set.add("ORM");
+        set.add(StoreManager.OPTION_APPLICATION_ID);
+        set.add(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED);
+        set.add(StoreManager.OPTION_ORM);
         return set;
     }
 }
