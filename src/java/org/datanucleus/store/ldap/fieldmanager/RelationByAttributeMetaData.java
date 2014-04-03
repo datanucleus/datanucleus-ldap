@@ -119,9 +119,6 @@ public class RelationByAttributeMetaData
         return emptyValue;
     }
 
-    /**
-     * Returns the attribute name of the relationship owner
-     */
     public String getOwnerAttributeName()
     {
         if (mmd.getMappedBy() != null)

@@ -199,7 +199,6 @@ public class LDAPUtils
      * @param dn The distinguished name
      * @param suffix the suffix defined in "dn" extension
      * @return the distinguished name of the parent object
-     * @throws InvalidNameException
      */
     public static LdapName getParentDistingueshedName(LdapName dn, LdapName suffix)
     {
@@ -228,6 +227,7 @@ public class LDAPUtils
     /**
      * Convenience method to return the distinguished name for the object being managed. Uses the extension "dn" if
      * specified, else the "table" if specified as parent container. Uses the PK name and value as RDN.
+     * @param storeMgr Store Manager
      * @param op ObjectProvider
      * @return Distinguished name
      */
@@ -239,6 +239,7 @@ public class LDAPUtils
     /**
      * Convenience method to return the distinguished name for the object being managed. Uses the extension "dn" if
      * specified, else the "table" if specified as parent container. Uses the PK name and value as RDN.
+     * @param storeMgr Store Manager
      * @param op ObjectProvider
      * @param forceFetchHierarchicalMappedDn true to fetch the name from directory server
      * @return Distinguished name
@@ -641,6 +642,7 @@ public class LDAPUtils
 
     /**
      * Gets the attribute value of an specific attribute name from the state manager.
+     * @param storeMgr Store Manager
      * @param op ObjectProvider
      * @param attributeName the attribute name
      * @return the attribute value
@@ -670,6 +672,7 @@ public class LDAPUtils
 
     /**
      * Gets the attribute value of an specific attribute name from LDAP.
+     * @param storeMgr Store Manager
      * @param op ObjectProvider
      * @param attributeName the attribute name
      * @return the attribute value
@@ -759,7 +762,7 @@ public class LDAPUtils
      * @param rdn the rdn
      * @param suffix the suffix
      * @return the ldap name
-     * @throws InvalidNameException
+     * @throws InvalidNameException if error occurs
      */
     public static LdapName composeDistinguishedName(LdapName parentDn, Rdn rdn, LdapName suffix) throws InvalidNameException
     {
@@ -806,6 +809,7 @@ public class LDAPUtils
 
     /**
      * Gets an object by type and attribute.
+     * @param storeMgr Store Manager
      * @param ec object manager
      * @param type the object type
      * @param attributeName the attribute name
@@ -897,6 +901,7 @@ public class LDAPUtils
 
     /**
      * Convenience method to get all objects of the candidate type (and optional subclasses).
+     * @param storeMgr Store Manager
      * @param ec The object manager
      * @param compilation The query
      * @param parameters The input parameters
@@ -967,6 +972,7 @@ public class LDAPUtils
     }
 
     /**
+     * @param storeMgr Store Manager
      * @param ec The object manager
      * @param candidateCmd The class meta data of the candidate
      * @param base the search base, or null to use the base of candidateCmd
