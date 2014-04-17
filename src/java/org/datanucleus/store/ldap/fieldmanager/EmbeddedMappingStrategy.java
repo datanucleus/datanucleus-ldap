@@ -120,7 +120,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 Arrays.asList(embeddedMetaData.getMemberMetaData()));
 
         // TODO Provide the owner in this call
-        ObjectProvider embeddedSM = ec.newObjectProviderForEmbedded(effectiveClassMetaData, null, -1);
+        ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
         // TODO Why get SM just after creating it????
         embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
         Object value = fetchMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
@@ -176,7 +176,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         for (Attributes embeddedAttrs : entries.values())
         {
             // TODO Populate the owner object in this call
-            ObjectProvider embeddedSM = ec.newObjectProviderForEmbedded(effectiveClassMetaData, null, -1);
+            ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             // TODO Why get SM just after creating it????
             embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
             Object value = fetchMerge(embeddedSM, embeddedAttrs, embeddedMmds, embeddedMetaData);
@@ -198,7 +198,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 for (Attributes embeddedAttrs : entries.values())
                 {
                     // TODO Pass in owner to this call
-                    ObjectProvider embeddedSM = ec.newObjectProviderForEmbedded(cmd, null, -1);
+                    ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, null, -1);
                     // TODO Why get SM just after creating it????
                     embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
                     Object value = fetchMerge(embeddedSM, embeddedAttrs, embeddedMmds, embeddedMetaData);
@@ -622,7 +622,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         {
             // create an instance with empty fields, this will null-out all embedded fields
             // TODO Populate the owner object in this call
-            ObjectProvider embeddedSM = ec.newObjectProviderForEmbedded(effectiveClassMetaData, null, -1);
+            ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             int[] allMemberPositions = embeddedSM.getClassMetaData().getAllMemberPositions();
             for (int i : allMemberPositions)
             {
@@ -718,7 +718,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData
                     .getMemberMetaData()));
             // TODO Populate the owner object in this call
-            ObjectProvider embeddedSM = ec.newObjectProviderForEmbedded(effectiveClassMetaData, null, -1);
+            ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
             {
                 AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, new BasicAttributes());
