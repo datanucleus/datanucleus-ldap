@@ -48,9 +48,9 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.Transaction;
-import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -1088,8 +1088,7 @@ public class LDAPUtils
             }
             if (checkInheritance)
             {
-                ApiAdapter api = ec.getApiAdapter();
-                if (oid instanceof OID || api.isSingleFieldIdentity(oid))
+                if (oid instanceof OID || IdentityUtils.isSingleFieldIdentity(oid))
                 {
                     // Check if this id for any known subclasses is in the cache to save searching
                     String[] subclasses = ec.getMetaDataManager().getSubclassesForClass(pcCls.getName(), true);
@@ -1097,15 +1096,14 @@ public class LDAPUtils
                     {
                         for (int i=0;i<subclasses.length;i++)
                         {
-                            if (api.isDatastoreIdentity(oid))
+                            if (IdentityUtils.isDatastoreIdentity(oid))
                             {
                                 oid = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], ((OID)oid).getKeyValue());
                             }
-                            else if (api.isSingleFieldIdentity(oid))
+                            else if (IdentityUtils.isSingleFieldIdentity(oid))
                             {
-                                oid = api.getNewSingleFieldIdentity(oid.getClass(),
-                                    ec.getClassLoaderResolver().classForName(subclasses[i]), 
-                                    api.getTargetKeyForSingleFieldIdentity(oid));
+                                oid = IdentityUtils.getNewSingleFieldIdentity(oid.getClass(),
+                                    ec.getClassLoaderResolver().classForName(subclasses[i]), IdentityUtils.getTargetKeyForSingleFieldIdentity(oid));
                             }
                             pc = ec.getObjectFromCache(oid);
                             if (pc != null)
