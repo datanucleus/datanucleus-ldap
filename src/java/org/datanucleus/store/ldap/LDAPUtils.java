@@ -51,7 +51,6 @@ import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -1088,7 +1087,7 @@ public class LDAPUtils
             }
             if (checkInheritance)
             {
-                if (oid instanceof OID || IdentityUtils.isSingleFieldIdentity(oid))
+                if (IdentityUtils.isDatastoreIdentity(oid) || IdentityUtils.isSingleFieldIdentity(oid))
                 {
                     // Check if this id for any known subclasses is in the cache to save searching
                     String[] subclasses = ec.getMetaDataManager().getSubclassesForClass(pcCls.getName(), true);
@@ -1098,7 +1097,7 @@ public class LDAPUtils
                         {
                             if (IdentityUtils.isDatastoreIdentity(oid))
                             {
-                                oid = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], ((OID)oid).getKeyValue());
+                                oid = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(oid));
                             }
                             else if (IdentityUtils.isSingleFieldIdentity(oid))
                             {
