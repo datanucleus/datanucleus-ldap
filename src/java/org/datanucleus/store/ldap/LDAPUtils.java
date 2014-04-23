@@ -51,7 +51,6 @@ import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -1097,11 +1096,11 @@ public class LDAPUtils
                         {
                             if (IdentityUtils.isDatastoreIdentity(oid))
                             {
-                                oid = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(oid));
+                                oid = ec.getNucleusContext().getIdentityManager().getDatastoreId(subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(oid));
                             }
                             else if (IdentityUtils.isSingleFieldIdentity(oid))
                             {
-                                oid = IdentityUtils.getNewSingleFieldIdentity(oid.getClass(),
+                                oid = ec.getNucleusContext().getIdentityManager().getSingleFieldId(oid.getClass(),
                                     ec.getClassLoaderResolver().classForName(subclasses[i]), IdentityUtils.getTargetKeyForSingleFieldIdentity(oid));
                             }
                             pc = ec.getObjectFromCache(oid);
