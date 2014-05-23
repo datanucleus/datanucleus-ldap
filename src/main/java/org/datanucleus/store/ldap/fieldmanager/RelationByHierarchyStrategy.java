@@ -37,12 +37,10 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.ldap.LDAPUtils.LocationInfo;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.Localiser;
 
 import org.datanucleus.store.StoreManager;
 
@@ -51,9 +49,6 @@ import org.datanucleus.store.StoreManager;
  */
 public class RelationByHierarchyStrategy extends AbstractMappingStrategy
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.ldap.Localisation", LDAPStoreManager.class.getClassLoader());
-
     protected int fieldNumber;
 
     protected StoreManager storeMgr;

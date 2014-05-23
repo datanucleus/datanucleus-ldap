@@ -29,12 +29,18 @@ import org.datanucleus.flush.FlushOrdered;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.store.AbstractStoreManager;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.util.Localiser;
 
 /**
  * Manager for LDAP datastores.
  */
 public class LDAPStoreManager extends AbstractStoreManager
 {
+    static
+    {
+        Localiser.registerBundle("org.datanucleus.store.ldap.Localisation", LDAPStoreManager.class.getClassLoader());
+    }
+
     MetaDataListener metadataListener;
 
     /**

@@ -22,17 +22,12 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.TransactionEventListener;
-import org.datanucleus.util.Localiser;
 
 /**
  * Transaction Event Listener for the LDAP store.
  */
 public class LDAPTransactionEventListener implements TransactionEventListener
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.store.ldap.Localisation", 
-        LDAPStoreManager.class.getClassLoader());
-
     Set<Object> objectsToPersist = new HashSet<Object>();
 
     Set<Object> objectsToDelete = new HashSet<Object>();

@@ -40,7 +40,6 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
@@ -51,9 +50,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class RelationByDnStrategy extends AbstractMappingStrategy
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.ldap.Localisation", LDAPStoreManager.class.getClassLoader());
-
     protected int fieldNumber;
 
     protected StoreManager storeMgr;
@@ -98,7 +94,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
             }
 
-            throw new NucleusException(LOCALISER.msg("LDAP.Retrieve.RelationTypeNotSupported",
+            throw new NucleusException(Localiser.msg("LDAP.Retrieve.RelationTypeNotSupported",
                 mmd.getFullFieldName(), mmd.getRelationType(clr)));
         }
         else
@@ -147,7 +143,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
             }
 
-            throw new NucleusException(LOCALISER.msg("LDAP.Retrieve.RelationTypeNotSupported",
+            throw new NucleusException(Localiser.msg("LDAP.Retrieve.RelationTypeNotSupported",
                 mmd.getFullFieldName(), mmd.getRelationType(clr)));
         }
     }
@@ -183,7 +179,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER.msg("LDAP.Persist.RelationTypeNotSupported",
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
                         mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
@@ -221,7 +217,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER.msg("LDAP.Persist.RelationTypeNotSupported",
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
                         mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
@@ -304,7 +300,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER.msg("LDAP.Persist.RelationTypeNotSupported",
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
                         mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
@@ -385,7 +381,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER.msg("LDAP.Persist.RelationTypeNotSupported",
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
                         mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
@@ -474,8 +470,8 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         addEmptyValue(emptyValue, pcAttribute);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("LDAP.JNDI.DeleteDnReference", oldPcDN, dn));
-                            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("LDAP.JNDI.modifyAttributes", oldPcDN, "REPLACE",
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.DeleteDnReference", oldPcDN, dn));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", oldPcDN, "REPLACE",
                                 pcAttributes));
                         }
                         ctx.modifyAttributes(oldPcDN, DirContext.REPLACE_ATTRIBUTE, pcAttributes);
@@ -524,8 +520,8 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                     removeEmptyValue(emptyValue, attribute);
                     if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("LDAP.JNDI.AddDnReference", newPcDN, dn));
-                        NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("LDAP.JNDI.modifyAttributes", newPcDN, "REPLACE", attributes));
+                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.AddDnReference", newPcDN, dn));
+                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", newPcDN, "REPLACE", attributes));
                     }
                     ctx.modifyAttributes(newPcDN, DirContext.REPLACE_ATTRIBUTE, attributes);
                 }

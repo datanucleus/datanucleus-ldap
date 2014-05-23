@@ -72,10 +72,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class LDAPUtils
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.store.ldap.Localisation", 
-        LDAPStoreManager.class.getClassLoader());
-
     public static final String[] NO_ATTRIBUTES = new String[0];
 
     /**
@@ -298,7 +294,7 @@ public class LDAPUtils
                         DirContext ctx = (DirContext) mconn.getConnection();
                         if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER.msg("LDAP.JNDI.search", base, filter, searchControls
+                            NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.JNDI.search", base, filter, searchControls
                                     .getSearchScope()));
                         }
                         NamingEnumeration<SearchResult> enumeration = ctx.search(base, filter, searchControls);
@@ -684,7 +680,7 @@ public class LDAPUtils
             DirContext ctx = (DirContext) mconn.getConnection();
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.getAttributes", dn, attributeName, ""));
+                NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.getAttributes", dn, attributeName, ""));
             }
             Attributes attributes = ctx.getAttributes(dn, new String[]{attributeName});
             Attribute attribute = attributes.get(attributeName);
@@ -852,7 +848,7 @@ public class LDAPUtils
             DirContext ctx = (DirContext) mconn.getConnection();
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.rename", oldDn, newDn));
+                NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.rename", oldDn, newDn));
             }
             ctx.rename(oldDn, newDn);
         }
@@ -956,7 +952,7 @@ public class LDAPUtils
                 }
                 catch (Throwable e)
                 {
-                    NucleusLogger.QUERY.warn(LOCALISER.msg("LDAP.Query.NativeQueryFailed"));
+                    NucleusLogger.QUERY.warn(Localiser.msg("LDAP.Query.NativeQueryFailed"));
                     // on error switch back to in-memory handling
                     inMemory = true;
                 }
@@ -1199,7 +1195,7 @@ public class LDAPUtils
 
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.search", base, filter, searchControls.getSearchScope()));
+                NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.search", base, filter, searchControls.getSearchScope()));
             }
 
             NamingEnumeration<SearchResult> enumeration = ctx.search(base.toString(), filter, searchControls);;
@@ -1238,7 +1234,7 @@ public class LDAPUtils
     {
         if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.createSubcontext", dn, attributes));
+            NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.createSubcontext", dn, attributes));
         }
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
@@ -1260,7 +1256,7 @@ public class LDAPUtils
     {
         if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attributes));
+            NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attributes));
         }
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
@@ -1310,7 +1306,7 @@ public class LDAPUtils
             {
                 if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.destroySubcontext", resultDn));
+                    NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.destroySubcontext", resultDn));
                 }
                 ctx.unbind(resultDn);
             }
@@ -1323,7 +1319,7 @@ public class LDAPUtils
         // now all child entries are deleted, delete parent again
         if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER.msg("LDAP.JNDI.destroySubcontext", dn));
+            NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.destroySubcontext", dn));
         }
         ctx.unbind(dn);
     }

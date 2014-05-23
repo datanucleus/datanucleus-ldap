@@ -71,10 +71,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER_LDAP = Localiser.getInstance("org.datanucleus.store.ldap.Localisation",
-        LDAPStoreManager.class.getClassLoader());
-
     /**
      * Constructor.
      * @param storeMgr Manager for the datastore
@@ -116,7 +112,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             }
             else if (locationInfo.dn == null)
             {
-                throw new NucleusUserException(LOCALISER_LDAP.msg("LDAP.Insert.MissingParentReference", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                throw new NucleusUserException(Localiser.msg("LDAP.Insert.MissingParentReference", op.getObjectAsPrintable(), op.getInternalObjectId()));
             }
         }
 
@@ -126,7 +122,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            throw new NucleusUserException(LOCALISER_LDAP.msg("LDAP.DatastoreID"));
+            throw new NucleusUserException(Localiser.msg("LDAP.DatastoreID"));
         }
 
         Set<String> objectClasses = LDAPUtils.getObjectClassesForClass(op.getClassMetaData());
@@ -143,8 +139,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.Insert.Start", op.getObjectAsPrintable(), op
-                        .getInternalObjectId()));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Insert.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
             }
 
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -184,7 +179,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             attrs.put(objectClass);
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.JNDI.createSubcontext", dn, attrs));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.createSubcontext", dn, attrs));
             }
             // use bind() method here
             // createSubContext returns a new Context object leads to problems when using connection pooling
@@ -199,7 +194,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attrs));
+                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attrs));
                 }
                 ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
             }
@@ -207,7 +202,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             // TODO Implement version retrieval
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
             }
             if (ec.getStatistics() != null)
             {
@@ -216,13 +211,12 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(LOCALISER_LDAP.msg("LDAP.Insert.ObjectPersisted", op.getObjectAsPrintable(), op
-                        .getInternalObjectId()));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("LDAP.Insert.ObjectPersisted", op.getObjectAsPrintable(), op.getInternalObjectId()));
             }
         }
         catch (NameAlreadyBoundException e)
         {
-            throw new NucleusUserException(LOCALISER_LDAP.msg("LDAP.Insert.ObjectWithIdAlreadyExists",
+            throw new NucleusUserException(Localiser.msg("LDAP.Insert.ObjectWithIdAlreadyExists",
                 op.getObjectAsPrintable(), op.getInternalObjectId()), e);
         }
         catch (NamingException e)
@@ -264,8 +258,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                     }
                     fieldStr.append(cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]).getName());
                 }
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.Update.Start", op.getObjectAsPrintable(), op
-                        .getInternalObjectId(), fieldStr.toString()));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Update.Start", op.getObjectAsPrintable(), op.getInternalObjectId(), fieldStr.toString()));
             }
 
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -318,13 +311,13 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER_LDAP.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attrs));
+                    NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attrs));
                 }
                 ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
             }
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
             }
             if (ec.getStatistics() != null)
             {
@@ -371,20 +364,20 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         {
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.Delete.Start", op.getObjectAsPrintable(), op
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Delete.Start", op.getObjectAsPrintable(), op
                         .getInternalObjectId()));
             }
 
             LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER_LDAP.msg("LDAP.JNDI.destroySubcontext", dn));
+                NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.destroySubcontext", dn));
             }
             ctx.unbind(dn);
 
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
             }
             if (ec.getStatistics() != null)
             {
@@ -399,7 +392,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.DeleteRecursive.Start", op.getObjectAsPrintable(),
+                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.DeleteRecursive.Start", op.getObjectAsPrintable(),
                             op.getInternalObjectId()));
                 }
 
@@ -407,7 +400,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
+                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
                 }
             }
             catch (NamingException e)
@@ -536,11 +529,11 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                         }
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.JNDI.DeleteDnReference", srName, dn));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.DeleteDnReference", srName, dn));
                         }
                         if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER_LDAP.msg("LDAP.JNDI.modifyAttributes", srName, "REPLACE", attrs));
+                            NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", srName, "REPLACE", attrs));
                         }
                         ctx.modifyAttributes(srName, DirContext.REPLACE_ATTRIBUTE, attrs);
                     }
@@ -671,12 +664,12 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                         }
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER_LDAP.msg("LDAP.JNDI.DeleteAttributeReference", attributeName,
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.DeleteAttributeReference", attributeName,
                                 attributeValue, srName));
                         }
                         if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER_LDAP.msg("LDAP.JNDI.modifyAttributes", srName, "REPLACE", attrs));
+                            NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", srName, "REPLACE", attrs));
                         }
                         ctx.modifyAttributes(srName, DirContext.REPLACE_ATTRIBUTE, attrs);
                     }
@@ -742,8 +735,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER_LDAP.msg("LDAP.Fetch.Start", op.getObjectAsPrintable(), op
-                        .getInternalObjectId()));
+                NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Fetch.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
             }
 
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -751,7 +743,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER_LDAP.msg("LDAP.JNDI.getAttributes", dn, attributeNameList, ""));
+                NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.getAttributes", dn, attributeNameList, ""));
             }
 
             final Attributes result = ctx.getAttributes(dn, attributeNames);
@@ -759,7 +751,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
             if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER_LDAP.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
+                NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
             }
             if (ec.getStatistics() != null)
             {
@@ -810,19 +802,18 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                 long startTime = System.currentTimeMillis();
                 if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER_LDAP.msg("LDAP.Locate.Start", op.getObjectAsPrintable(), op
-                            .getInternalObjectId()));
+                    NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Locate.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
                 }
                 DirContext ctx = (DirContext) mconn.getConnection();
                 LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
                 if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_NATIVE.debug(LOCALISER_LDAP.msg("LDAP.JNDI.getAttributes", dn, "none", ""));
+                    NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.getAttributes", dn, "none", ""));
                 }
                 ctx.getAttributes(dn, LDAPUtils.NO_ATTRIBUTES);
                 if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER_LDAP.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
+                    NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.ExecutionTime", (System.currentTimeMillis() - startTime)));
                 }
                 if (ec.getStatistics() != null)
                 {
@@ -845,7 +836,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            throw new NucleusUserException(LOCALISER_LDAP.msg("LDAP.DatastoreID"));
+            throw new NucleusUserException(Localiser.msg("LDAP.DatastoreID"));
         }
     }
 }
