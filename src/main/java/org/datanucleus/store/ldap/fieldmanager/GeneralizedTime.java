@@ -503,7 +503,7 @@ public class GeneralizedTime implements Comparable<GeneralizedTime>
 
         NumberFormat twoDigits = new DecimalFormat("00");
         NumberFormat fourDigits = new DecimalFormat("00");
-        StringBuffer fractionFormat = new StringBuffer("");
+        StringBuilder fractionFormat = new StringBuilder("");
         for (int i = 0; i < fractionLength && i < 3; i++)
         {
             fractionFormat.append("0");

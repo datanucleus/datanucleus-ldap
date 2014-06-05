@@ -439,7 +439,7 @@ public class LDAPUtils
             return null;
         }
 
-        StringBuffer filter = new StringBuffer();
+        StringBuilder filter = new StringBuilder();
         if (objectClasses.size() > 1 || urlFilter != null)
         {
             filter.append("(&");

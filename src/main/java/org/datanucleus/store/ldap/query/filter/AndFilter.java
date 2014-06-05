@@ -40,7 +40,7 @@ public class AndFilter extends AbstractBranchFilter
      */
     public String toString()
     {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("(&");
         for (Filter child : getChildren())
         {

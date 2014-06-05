@@ -249,7 +249,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
                 AbstractClassMetaData cmd = op.getClassMetaData();
-                StringBuffer fieldStr = new StringBuffer();
+                StringBuilder fieldStr = new StringBuilder();
                 for (int i = 0; i < fieldNumbers.length; i++)
                 {
                     if (i > 0)
@@ -703,7 +703,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
-            StringBuffer str = new StringBuffer("Fetching object \"");
+            StringBuilder str = new StringBuilder("Fetching object \"");
             str.append(op.getObjectAsPrintable()).append("\" (id=");
             str.append(op.getInternalObjectId()).append(")").append(" fields [");
             for (int i = 0; i < fieldNumbers.length; i++)
