@@ -17,10 +17,11 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.store.ldap.query;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -68,7 +69,7 @@ public class QueryToLDAPFilterMapper extends AbstractExpressionEvaluator
     SymbolTable symtbl;
 
     /** The stack */
-    Stack stack = new Stack();
+    Deque stack = new ArrayDeque();
 
     /** Map with LDAP attribute types */
     Map ldapAttributeTypeMap;
@@ -98,7 +99,7 @@ public class QueryToLDAPFilterMapper extends AbstractExpressionEvaluator
         if (filterExpr != null)
         {
             filterExpr.evaluate(this);
-            if (!stack.empty())
+            if (!stack.isEmpty())
             {
                 Object object = stack.pop();
                 if (object instanceof Filter)
