@@ -113,8 +113,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         }
 
         // TODO Localise this
-        throw new NucleusException(
-                "Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
+        throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
     }
 
     private Object getHierarchicalMappedChild(AbstractMemberMetaData mmd, ObjectProvider sm)
@@ -125,10 +124,8 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
             Object value = coll.iterator().next();
             return value;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     private Collection<Object> getHierarchicalMappedChildren(String type, String mappedBy, AbstractMemberMetaData mmd,

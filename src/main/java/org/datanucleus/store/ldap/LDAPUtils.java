@@ -1198,7 +1198,7 @@ public class LDAPUtils
                 NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.search", base, filter, searchControls.getSearchScope()));
             }
 
-            NamingEnumeration<SearchResult> enumeration = ctx.search(base.toString(), filter, searchControls);;
+            NamingEnumeration<SearchResult> enumeration = ctx.search(base.toString(), filter, searchControls);
             while (enumeration.hasMoreElements())
             {
                 final SearchResult sr = enumeration.nextElement();

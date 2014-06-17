@@ -268,10 +268,8 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             }
             return embeddedSM.getObject();
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     private Collection<Object> getCollectionInstance(Class<?> collectionType)

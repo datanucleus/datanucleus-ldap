@@ -107,15 +107,11 @@ public class QueryToLDAPFilterMapper extends AbstractExpressionEvaluator
                     Filter additionalFilter = (Filter) object;
                     return additionalFilter.toString();
                 }
-                else
-                {
-                    throw new NucleusException("Unexpected element on stack: object=" + object);
-                }
+
+                throw new NucleusException("Unexpected element on stack: object=" + object);
             }
-            else
-            {
-                throw new NucleusException("Unexpected empty stack");
-            }
+
+            throw new NucleusException("Unexpected empty stack");
         }
 
         return null;
@@ -261,7 +257,7 @@ public class QueryToLDAPFilterMapper extends AbstractExpressionEvaluator
             if (method.equals("startsWith"))
             {
                 // TODO Check if the field we invoke on is String-based
-                Expression param = (Expression) expr.getArguments().get(0);
+                Expression param = expr.getArguments().get(0);
                 String value = QueryUtils.getStringValueForExpression(param, parameters);
                 filter = new SubstringFilter(attribute);
                 filter.setInitialPattern(getEscapedValue(value));
@@ -270,7 +266,7 @@ public class QueryToLDAPFilterMapper extends AbstractExpressionEvaluator
             else if (method.equals("endsWith"))
             {
                 // TODO Check if the field we invoke on is String-based
-                Expression param = (Expression) expr.getArguments().get(0);
+                Expression param = expr.getArguments().get(0);
                 String value = QueryUtils.getStringValueForExpression(param, parameters);
                 filter = new SubstringFilter(attribute);
                 filter.setFinalPattern(getEscapedValue(value));

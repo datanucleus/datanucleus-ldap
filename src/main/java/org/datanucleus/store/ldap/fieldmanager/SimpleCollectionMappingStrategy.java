@@ -153,12 +153,9 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
             op.setAssociatedValue("COLL" + fieldNumber, collection);
             return op.wrapSCOField(fieldNumber, collection, false, false, true);
         }
-        else
-        {
-            // TODO Localise this
-            throw new NucleusException(
-                    "Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
-        }
+
+        // TODO Localise this
+        throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
     }
 
     public void insert(Object value)

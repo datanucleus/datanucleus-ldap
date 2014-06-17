@@ -172,18 +172,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (boolean[]) TypeConversionHelper.getBooleanArrayFromByteArray(bytes);
+            return TypeConversionHelper.getBooleanArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        boolean[] values = new boolean[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            boolean[] values = new boolean[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Boolean(stringValues[i]).booleanValue();
-            }
-            return values;
+            values[i] = new Boolean(stringValues[i]).booleanValue();
         }
+        return values;
     }
 
     protected Boolean[] fetchBooleanObjectArrayField()
@@ -191,18 +189,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Boolean[]) TypeConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Boolean[] values = new Boolean[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Boolean[] values = new Boolean[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Boolean(stringValues[i]);
-            }
-            return values;
+            values[i] = new Boolean(stringValues[i]);
         }
+        return values;
     }
 
     protected byte[] fetchByteArrayField()
@@ -222,10 +218,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
                     {
                         return (byte[]) object;
                     }
-                    else
-                    {
-                        throw new NucleusException("Not a byte[]");
-                    }
+                    throw new NucleusException("Not a byte[]");
                 }
                 catch (NamingException e)
                 {
@@ -237,16 +230,14 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
                 throw new NucleusException("Can't fetch embedded byte[] from multi-valued attribute.");
             }
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        byte[] values = new byte[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            byte[] values = new byte[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Byte(stringValues[i]).byteValue();
-            }
-            return values;
+            values[i] = new Byte(stringValues[i]).byteValue();
         }
+        return values;
     }
 
     protected Byte[] fetchByteObjectArrayField()
@@ -254,18 +245,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Byte[]) TypeConversionHelper.getByteObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getByteObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Byte[] values = new Byte[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Byte[] values = new Byte[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Byte(stringValues[i]);
-            }
-            return values;
+            values[i] = new Byte(stringValues[i]);
         }
+        return values;
     }
 
     protected char[] fetchCharArrayField()
@@ -273,18 +262,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (char[]) TypeConversionHelper.getCharArrayFromByteArray(bytes);
+            return TypeConversionHelper.getCharArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        char[] values = new char[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            char[] values = new char[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = stringValues[i].charAt(0);
-            }
-            return values;
+            values[i] = stringValues[i].charAt(0);
         }
+        return values;
     }
 
     protected Character[] fetchCharacterObjectArrayField()
@@ -292,18 +279,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Character[]) TypeConversionHelper.getCharObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getCharObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Character[] values = new Character[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Character[] values = new Character[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Character(stringValues[i].charAt(0));
-            }
-            return values;
+            values[i] = new Character(stringValues[i].charAt(0));
         }
+        return values;
     }
 
     protected double[] fetchDoubleArrayField()
@@ -311,18 +296,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (double[]) TypeConversionHelper.getDoubleArrayFromByteArray(bytes);
+            return TypeConversionHelper.getDoubleArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        double[] values = new double[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            double[] values = new double[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Double(stringValues[i]).doubleValue();
-            }
-            return values;
+            values[i] = new Double(stringValues[i]).doubleValue();
         }
+        return values;
     }
 
     protected Double[] fetchDoubleObjectArrayField()
@@ -330,18 +313,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Double[]) TypeConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Double[] values = new Double[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Double[] values = new Double[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Double(stringValues[i]);
-            }
-            return values;
+            values[i] = new Double(stringValues[i]);
         }
+        return values;
     }
 
     protected float[] fetchFloatArrayField()
@@ -349,18 +330,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (float[]) TypeConversionHelper.getFloatArrayFromByteArray(bytes);
+            return TypeConversionHelper.getFloatArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        float[] values = new float[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            float[] values = new float[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Float(stringValues[i]).floatValue();
-            }
-            return values;
+            values[i] = new Float(stringValues[i]).floatValue();
         }
+        return values;
     }
 
     protected Float[] fetchFloatObjectArrayField()
@@ -368,18 +347,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Float[]) TypeConversionHelper.getFloatObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getFloatObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Float[] values = new Float[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Float[] values = new Float[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Float(stringValues[i]);
-            }
-            return values;
+            values[i] = new Float(stringValues[i]);
         }
+        return values;
     }
 
     protected int[] fetchIntArrayField()
@@ -387,18 +364,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (int[]) TypeConversionHelper.getIntArrayFromByteArray(bytes);
+            return TypeConversionHelper.getIntArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        int[] values = new int[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            int[] values = new int[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Integer(stringValues[i]).intValue();
-            }
-            return values;
+            values[i] = new Integer(stringValues[i]).intValue();
         }
+        return values;
     }
 
     protected Integer[] fetchIntegerObjectArrayField()
@@ -406,18 +381,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Integer[]) TypeConversionHelper.getIntObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getIntObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Integer[] values = new Integer[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Integer[] values = new Integer[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = new Integer(stringValues[i]);
-            }
-            return values;
+            values[i] = new Integer(stringValues[i]);
         }
+        return values;
     }
 
     protected long[] fetchLongArrayField()
@@ -425,18 +398,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (long[]) TypeConversionHelper.getLongArrayFromByteArray(bytes);
+            return TypeConversionHelper.getLongArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        long[] values = new long[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            long[] values = new long[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = Long.valueOf(stringValues[i]).longValue();
-            }
-            return values;
+            values[i] = Long.valueOf(stringValues[i]).longValue();
         }
+        return values;
     }
 
     protected Long[] fetchLongObjectArrayField()
@@ -444,18 +415,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Long[]) TypeConversionHelper.getLongObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getLongObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Long[] values = new Long[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Long[] values = new Long[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = Long.valueOf(stringValues[i]);
-            }
-            return values;
+            values[i] = Long.valueOf(stringValues[i]);
         }
+        return values;
     }
 
     protected short[] fetchShortArrayField()
@@ -463,18 +432,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (short[]) TypeConversionHelper.getShortArrayFromByteArray(bytes);
+            return TypeConversionHelper.getShortArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        short[] values = new short[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            short[] values = new short[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = Short.valueOf(stringValues[i]).shortValue();
-            }
-            return values;
+            values[i] = Short.valueOf(stringValues[i]).shortValue();
         }
+        return values;
     }
 
     protected Short[] fetchShortObjectArrayField()
@@ -482,18 +449,16 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         if (mmd.getJoinMetaData() == null)
         {
             byte[] bytes = fetchByteArrayField();
-            return (Short[]) TypeConversionHelper.getShortObjectArrayFromByteArray(bytes);
+            return TypeConversionHelper.getShortObjectArrayFromByteArray(bytes);
         }
-        else
+
+        String[] stringValues = fetchStringArrayField();
+        Short[] values = new Short[stringValues.length];
+        for (int i = 0; i < stringValues.length; i++)
         {
-            String[] stringValues = fetchStringArrayField();
-            Short[] values = new Short[stringValues.length];
-            for (int i = 0; i < stringValues.length; i++)
-            {
-                values[i] = Short.valueOf(stringValues[i]);
-            }
-            return values;
+            values[i] = Short.valueOf(stringValues[i]);
         }
+        return values;
     }
 
     protected Enum[] fetchEnumArrayField(Class type)

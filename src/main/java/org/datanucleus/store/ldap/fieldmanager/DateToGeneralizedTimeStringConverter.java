@@ -31,6 +31,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class DateToGeneralizedTimeStringConverter implements TypeConverter<Date, String>
 {
+    private static final long serialVersionUID = 8064287866213991924L;
+
     public Date toMemberType(String str)
     {
         if (str == null)

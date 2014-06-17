@@ -108,58 +108,55 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             throw new NucleusException(Localiser.msg("LDAP.RelationTypeNotSupported", mmd.getFullFieldName(),
                 mmd.getRelationType(clr)));
         }
-        else
+
+        // current object is owner of the relation
+        if (RelationType.isRelationSingleValued(relationType))
         {
-            // current object is owner of the relation
-            if (RelationType.isRelationSingleValued(relationType))
+            // TODO: check empty value
+            try
             {
-                // TODO: check empty value
+                Object value = attr != null ? LDAPUtils.getObjectByAttribute(storeMgr, ec, mmd.getType(), joinAttributeName, (String) attr
+                    .get(0), op.getExecutionContext().getMetaDataManager()) : null;
+                return value;
+            }
+            catch (NamingException e)
+            {
+                throw new NucleusDataStoreException(e.getMessage(), e);
+            }
+        }
+        else if (RelationType.isRelationMultiValued(relationType))
+        {
+            if (mmd.hasCollection())
+            {
+                Collection<Object> coll = null;
+                Class instanceType = mmd.getType();
+                instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                 try
                 {
-                    Object value = attr != null ? LDAPUtils.getObjectByAttribute(storeMgr, ec, mmd.getType(), joinAttributeName, (String) attr
-                            .get(0), op.getExecutionContext().getMetaDataManager()) : null;
-                    return value;
+                    coll = (Collection<Object>) instanceType.newInstance();
+                    Class elementType = clr.classForName(mmd.getCollection().getElementType());
+                    removeEmptyValue(emptyValue, attr);
+                    for (int i = 0; attr != null && i < attr.size(); i++)
+                    {
+                        String value = (String) attr.get(i);
+                        Object o = LDAPUtils.getObjectByAttribute(storeMgr, ec, elementType, joinAttributeName, value, op
+                            .getExecutionContext().getMetaDataManager());
+                        coll.add(o);
+                    }
                 }
                 catch (NamingException e)
                 {
                     throw new NucleusDataStoreException(e.getMessage(), e);
                 }
-            }
-            else if (RelationType.isRelationMultiValued(relationType))
-            {
-                if (mmd.hasCollection())
+                catch (Exception e)
                 {
-                    Collection<Object> coll = null;
-                    Class instanceType = mmd.getType();
-                    instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
-                    try
-                    {
-                        coll = (Collection<Object>) instanceType.newInstance();
-                        Class elementType = clr.classForName(mmd.getCollection().getElementType());
-                        removeEmptyValue(emptyValue, attr);
-                        for (int i = 0; attr != null && i < attr.size(); i++)
-                        {
-                            String value = (String) attr.get(i);
-                            Object o = LDAPUtils.getObjectByAttribute(storeMgr, ec, elementType, joinAttributeName, value, op
-                                    .getExecutionContext().getMetaDataManager());
-                            coll.add(o);
-                        }
-                    }
-                    catch (NamingException e)
-                    {
-                        throw new NucleusDataStoreException(e.getMessage(), e);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new NucleusException("Error in trying to create object of type " + instanceType.getName(), e);
-                    }
-                    return op.wrapSCOField(fieldNumber, coll, false, false, true);
+                    throw new NucleusException("Error in trying to create object of type " + instanceType.getName(), e);
                 }
+                return op.wrapSCOField(fieldNumber, coll, false, false, true);
             }
-
-            throw new NucleusException(Localiser.msg("LDAP.Retrieve.RelationTypeNotSupported",
-                mmd.getFullFieldName(), mmd.getRelationType(clr)));
         }
+
+        throw new NucleusException(Localiser.msg("LDAP.Retrieve.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getRelationType(clr)));
     }
 
     public void insert(Object value)
@@ -426,11 +423,9 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             Object value = coll.iterator().next();
             return value;
         }
-        else
-        {
-            // no related object
-            return null;
-        }
+
+        // no related object
+        return null;
     }
 
     private Collection<Object> getAttributeMappedReferences(AbstractClassMetaData cmd, AbstractMemberMetaData mmd,

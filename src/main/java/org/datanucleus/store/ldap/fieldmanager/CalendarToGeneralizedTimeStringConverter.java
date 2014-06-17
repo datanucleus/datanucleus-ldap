@@ -29,6 +29,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class CalendarToGeneralizedTimeStringConverter implements TypeConverter<Calendar, String>
 {
+    private static final long serialVersionUID = -1538128042094072380L;
+
     public Calendar toMemberType(String str)
     {
         if (str == null)

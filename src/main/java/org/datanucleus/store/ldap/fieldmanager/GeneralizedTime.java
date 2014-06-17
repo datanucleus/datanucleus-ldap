@@ -623,10 +623,8 @@ public class GeneralizedTime implements Comparable<GeneralizedTime>
             GeneralizedTime other = (GeneralizedTime) obj;
             return calendar.equals(other.calendar);
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 
     /**

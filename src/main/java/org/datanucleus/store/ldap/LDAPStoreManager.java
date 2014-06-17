@@ -67,7 +67,7 @@ public class LDAPStoreManager extends AbstractStoreManager
     /**
      * Release of resources
      */
-    public void close()
+    public synchronized void close()
     {
         nucleusContext.getMetaDataManager().deregisterListener(metadataListener);
         super.close();
