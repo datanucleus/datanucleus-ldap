@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-
 Contributors :
  ...
  ***********************************************************************/
@@ -30,7 +29,6 @@ import javax.naming.directory.Attributes;
 import javax.naming.ldap.LdapName;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -78,20 +76,17 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         if (isFieldHierarchicalMapped)
         {
             RelationType relType = mmd.getRelationType(clr);
-            if (relType == RelationType.ONE_TO_ONE_UNI || relType == RelationType.ONE_TO_ONE_BI ||
-                relType == RelationType.MANY_TO_ONE_UNI)
+            if (RelationType.isRelationSingleValued(relType))
             {
                 // hierarchical mapped one-one relationships are always dependent!
                 mmd.setDependent(true);
-                Object value = getHierarchicalMappedChild(mmd, op);
-                return value;
+                return getHierarchicalMappedChild(mmd, op);
             }
             else if (relType == RelationType.ONE_TO_MANY_UNI || relType == RelationType.ONE_TO_MANY_BI)
             {
                 if (mmd.hasCollection())
                 {
-                    Collection<Object> coll = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(),
-                        mmd, op);
+                    Collection<Object> coll = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, op);
                     return op.wrapSCOField(fieldNumber, coll, false, false, true);
                 }
             }
@@ -121,15 +116,13 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         Collection<Object> coll = getHierarchicalMappedChildren(mmd.getTypeName(), mmd.getMappedBy(), null, sm);
         if (coll.iterator().hasNext())
         {
-            Object value = coll.iterator().next();
-            return value;
+            return coll.iterator().next();
         }
 
         return null;
     }
 
-    private Collection<Object> getHierarchicalMappedChildren(String type, String mappedBy, AbstractMemberMetaData mmd,
-        ObjectProvider sm)
+    private Collection<Object> getHierarchicalMappedChildren(String type, String mappedBy, AbstractMemberMetaData mmd, ObjectProvider sm)
     {
         Collection<Object> coll;
 
@@ -140,21 +133,19 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         }
         else
         {
-            collectionClass = mmd.getType();
-            collectionClass = SCOUtils.getContainerInstanceType(collectionClass, mmd.getOrderMetaData() != null);
+            collectionClass = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
         }
 
         try
         {
             coll = (Collection<Object>) collectionClass.newInstance();
-            
-            ExecutionContext om = sm.getExecutionContext();
-            ClassLoaderResolver clr = om.getClassLoaderResolver();
+
+            ClassLoaderResolver clr = ec.getClassLoaderResolver();
             MetaDataManager metaDataMgr = sm.getExecutionContext().getMetaDataManager();
             AbstractClassMetaData childCmd = metaDataMgr.getMetaDataForClass(type, clr);
             LdapName base = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
 
-            List<Object> objects = LDAPUtils.getObjectsOfCandidateType(storeMgr, om, childCmd, base, null, true, false);
+            List<Object> objects = LDAPUtils.getObjectsOfCandidateType(storeMgr, ec, childCmd, base, null, true, false);
             coll.addAll(objects);
         }
         catch (InstantiationException e)
@@ -180,8 +171,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
             else if (isFieldHierarchicalMapped)
             {
                 RelationType relType = mmd.getRelationType(clr);
-                if (relType == RelationType.ONE_TO_ONE_UNI || relType == RelationType.ONE_TO_ONE_BI ||
-                        relType == RelationType.MANY_TO_ONE_UNI)
+                if (RelationType.isRelationSingleValued(relType))
                 {
                     LDAPUtils.markForPersisting(value, ec);
                 }
@@ -200,15 +190,14 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                 else
                 {
                     // TODO Localise this
-                    throw new NucleusException("Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd
-                        .getTypeName() + " with relation type " + mmd.getRelationType(clr) + " is not supported for this datastore");
+                    throw new NucleusException("Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + 
+                        " with relation type " + mmd.getRelationType(clr) + " is not supported for this datastore");
                 }
             }
             else
             {
                 // TODO Localise this
-                throw new NucleusException(
-                        "Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + " is not supported for this datastore");
+                throw new NucleusException("Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + " is not supported for this datastore");
             }
         }
     }
@@ -234,7 +223,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                     Object oldValue = getHierarchicalMappedChild(mmd, op);
                     if (oldValue != null)
                     {
-                        ObjectProvider oldValueSM = LDAPUtils.getObjectProviderForObject(oldValue, ec, false);
+                        ObjectProvider oldValueSM = ec.findObjectProvider(oldValue, false);
                         if (mustDelete(oldValueSM))
                         {
                             // delete only if the old value is still a child of this state manager
@@ -243,7 +232,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                     }
 
                     // if new value.sm != null
-                    ObjectProvider valueSM = LDAPUtils.getObjectProviderForObject(value, ec, false);
+                    ObjectProvider valueSM = ec.findObjectProvider(value, false);
                     if (valueSM != null)
                     {
                         LdapName oldDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, valueSM, true);
@@ -268,8 +257,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                         // It was saved by FetchFieldManager and is used to determine added and removed elements.
                         // This is just a quick and dirty implementation, could use backed SCO later.
 
-                        Collection<Object> oldColl = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(),
-                            mmd, op);
+                        Collection<Object> oldColl = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, op);
                         Collection<Object> toAdd = null;
                         Collection<Object> toRemove = null;
                         Class instanceType = mmd.getType();
@@ -296,7 +284,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                             toRemove.removeAll(coll);
                             for (Object pc : toRemove)
                             {
-                                ObjectProvider pcSM = LDAPUtils.getObjectProviderForObject(pc, ec, false);
+                                ObjectProvider pcSM = ec.findObjectProvider(pc, false);
                                 if (mustDelete(pcSM))
                                 {
                                     // delete only if the old value is still a child of this state manager
@@ -310,7 +298,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                             toRemove.removeAll(coll);
                             for (Object pc : toRemove)
                             {
-                                ObjectProvider pcSM = LDAPUtils.getObjectProviderForObject(pc, ec, false);
+                                ObjectProvider pcSM = ec.findObjectProvider(pc, false);
                                 if (mustDelete(pcSM, mappedBy))
                                 {
                                     // System.out.println("deleteMap.put(5): " + pc);
@@ -345,8 +333,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
     {
         LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
         LdapName pcDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM, true);
-        boolean b = pcDn.startsWith(dn);
-        return b;
+        return pcDn.startsWith(dn);
     }
 
     /**
@@ -390,8 +377,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
             AbstractMemberMetaData mappedByMmd = targetCmd.getMetaDataForMember(mappedBy);
             if (mappedByMmd != null)
             {
-                boolean isMappedByParent = isParentOfHierarchicalMapping(mappedByMmd, mmgr);
-                return isMappedByParent;
+                return isParentOfHierarchicalMapping(mappedByMmd, mmgr);
             }
         }
 

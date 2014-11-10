@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-
 Contributors :
  ...
  ***********************************************************************/
@@ -31,7 +30,6 @@ import javax.naming.directory.DirContext;
 import javax.naming.ldap.LdapName;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -93,20 +91,18 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             if (RelationType.isRelationSingleValued(relationType))
             {
                 // TODO: check empty value
-                return getAttributeMappedReference(effectiveClassMetaData, ownerAttributeName, joinAttributeValue, ec);
+                return getAttributeMappedReference(effectiveClassMetaData, ownerAttributeName, joinAttributeValue);
             }
             else if (RelationType.isRelationMultiValued(relationType))
             {
                 if (mmd.hasCollection())
                 {
-                    Collection<Object> coll = getAttributeMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName,
-                        joinAttributeValue, ec);
+                    Collection<Object> coll = getAttributeMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, joinAttributeValue);
                     return op.wrapSCOField(fieldNumber, coll, false, false, true);
                 }
             }
 
-            throw new NucleusException(Localiser.msg("LDAP.RelationTypeNotSupported", mmd.getFullFieldName(),
-                mmd.getRelationType(clr)));
+            throw new NucleusException(Localiser.msg("LDAP.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getRelationType(clr)));
         }
 
         // current object is owner of the relation
@@ -115,9 +111,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             // TODO: check empty value
             try
             {
-                Object value = attr != null ? LDAPUtils.getObjectByAttribute(storeMgr, ec, mmd.getType(), joinAttributeName, (String) attr
-                    .get(0), op.getExecutionContext().getMetaDataManager()) : null;
-                return value;
+                return (attr != null) ? LDAPUtils.getObjectByAttribute(storeMgr, ec, mmd.getType(), joinAttributeName, (String) attr.get(0), ec.getMetaDataManager()) : null;
             }
             catch (NamingException e)
             {
@@ -138,9 +132,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                     removeEmptyValue(emptyValue, attr);
                     for (int i = 0; attr != null && i < attr.size(); i++)
                     {
-                        String value = (String) attr.get(i);
-                        Object o = LDAPUtils.getObjectByAttribute(storeMgr, ec, elementType, joinAttributeName, value, op
-                            .getExecutionContext().getMetaDataManager());
+                        Object o = LDAPUtils.getObjectByAttribute(storeMgr, ec, elementType, joinAttributeName, (String) attr.get(i), ec.getMetaDataManager());
                         coll.add(o);
                     }
                 }
@@ -174,7 +166,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, op, joinAttributeName);
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    addAttributeReference(value, ownerAttributeName, joinAttributeValue, emptyValue, ec);
+                    addAttributeReference(value, ownerAttributeName, joinAttributeValue, emptyValue);
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
@@ -185,14 +177,13 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         for (Object pc : c)
                         {
                             LDAPUtils.unmarkForDeletion(pc, ec);
-                            addAttributeReference(pc, ownerAttributeName, joinAttributeValue, emptyValue, ec);
+                            addAttributeReference(pc, ownerAttributeName, joinAttributeValue, emptyValue);
                         }
                     }
                 }
                 else
                 {
-                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
-                        mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
             else
@@ -200,8 +191,8 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 // current object is owner of the relation
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    ObjectProvider pcSM = LDAPUtils.getObjectProviderForObject(value, ec, true);
-                    Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, pcSM, joinAttributeName);
+                    ObjectProvider pcOP = ec.findObjectProvider(value, true);
+                    Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, pcOP, joinAttributeName);
                     BasicAttribute attr = new BasicAttribute(ownerAttributeName, joinAttributeValue);
                     addEmptyValue(emptyValue, attr);
                     attributes.put(attr);
@@ -215,7 +206,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         BasicAttribute attr = new BasicAttribute(ownerAttributeName);
                         for (Object pc : c)
                         {
-                            ObjectProvider pcSM = LDAPUtils.getObjectProviderForObject(pc, ec, true);
+                            ObjectProvider pcSM = ec.findObjectProvider(pc, true);
                             Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, pcSM, joinAttributeName);
                             attr.add(joinAttributeValue);
                         }
@@ -228,8 +219,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
-                        mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
         }
@@ -257,13 +247,13 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             {
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    Object oldValue = getAttributeMappedReference(effectiveClassMetaData, ownerAttributeName, joinAttributeValue, ec);
+                    Object oldValue = getAttributeMappedReference(effectiveClassMetaData, ownerAttributeName, joinAttributeValue);
                     if (!value.equals(oldValue))
                     {
                         LDAPUtils.markForPersisting(value, ec);
                         LDAPUtils.unmarkForDeletion(value, ec);
-                        removeAttributeReference(oldValue, ownerAttributeName, joinAttributeValue, emptyValue, ec);
-                        addAttributeReference(value, ownerAttributeName, joinAttributeValue, emptyValue, ec);
+                        removeAttributeReference(oldValue, ownerAttributeName, joinAttributeValue, emptyValue);
+                        addAttributeReference(value, ownerAttributeName, joinAttributeValue, emptyValue);
                     }
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
@@ -271,8 +261,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                     if (mmd.hasCollection())
                     {
                         Collection<Object> coll = (Collection<Object>) value;
-                        Collection<Object> oldColl = getAttributeMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName,
-                            joinAttributeValue, ec);
+                        Collection<Object> oldColl = getAttributeMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, joinAttributeValue);
                         if (oldColl != null)
                         {
                             Collection<Object> toAdd = null;
@@ -292,13 +281,13 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                             toAdd.removeAll(oldColl);
                             for (Object pc : toAdd)
                             {
-                                addAttributeReference(pc, ownerAttributeName, joinAttributeValue, emptyValue, ec);
+                                addAttributeReference(pc, ownerAttributeName, joinAttributeValue, emptyValue);
                                 LDAPUtils.unmarkForDeletion(pc, ec);
                             }
                             toRemove.removeAll(coll);
                             for (Object pc : toRemove)
                             {
-                                removeAttributeReference(pc, ownerAttributeName, joinAttributeValue, emptyValue, ec);
+                                removeAttributeReference(pc, ownerAttributeName, joinAttributeValue, emptyValue);
                                 // cascade-delete/dependent-element
                                 if (mmd.getCollection().isDependentElement())
                                 {
@@ -308,20 +297,19 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         }
                         else
                         {
-                            throw new NucleusDataStoreException("No old collection in SM " + op);
+                            throw new NucleusDataStoreException("No old collection in ObjectProvider " + op);
                         }
                     }
                 }
                 else
                 {
-                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
-                        mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
             else
             {
-                Object oldValue = getAttributeMappedReference(effectiveClassMetaData, ownerAttributeName, joinAttributeValue, ec);
-                removeAttributeReference(oldValue, ownerAttributeName, joinAttributeValue, emptyValue, ec);
+                Object oldValue = getAttributeMappedReference(effectiveClassMetaData, ownerAttributeName, joinAttributeValue);
+                removeAttributeReference(oldValue, ownerAttributeName, joinAttributeValue, emptyValue);
             }
         }
         else
@@ -333,7 +321,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 {
                     // TODO: check empty value
                     // TODO: delete dependent
-                    ObjectProvider smpc = LDAPUtils.getObjectProviderForObject(value, ec, true);
+                    ObjectProvider smpc = ec.findObjectProvider(value, true);
                     LDAPUtils.unmarkForDeletion(value, ec);
                     Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, smpc, joinAttributeName);
                     attributes.put(new BasicAttribute(ownerAttributeName, joinAttributeValue));
@@ -356,9 +344,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                                 Class elementType = clr.classForName(mmd.getCollection().getElementType());
                                 for (Object object : attributeValues)
                                 {
-                                    String oldValue = (String) object;
-                                    Object o = LDAPUtils.getObjectByAttribute(storeMgr, ec, elementType, joinAttributeName, oldValue, op
-                                            .getExecutionContext().getMetaDataManager());
+                                    Object o = LDAPUtils.getObjectByAttribute(storeMgr, ec, elementType, joinAttributeName, (String) object, ec.getMetaDataManager());
                                     oldColl.add(o);
                                 }
                             }
@@ -392,7 +378,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         for (Object pc : coll)
                         {
                             LDAPUtils.unmarkForDeletion(pc, ec);
-                            ObjectProvider smpc = LDAPUtils.getObjectProviderForObject(pc, ec, true);
+                            ObjectProvider smpc = ec.findObjectProvider(pc, true);
                             Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, smpc, joinAttributeName);
                             attr.add(joinAttributeValue);
                         }
@@ -414,14 +400,12 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         }
     }
 
-    private Object getAttributeMappedReference(AbstractClassMetaData cmd, String pcAttributeName,
-            Object myAttributeValue, ExecutionContext om)
+    private Object getAttributeMappedReference(AbstractClassMetaData cmd, String pcAttributeName, Object myAttributeValue)
     {
-        Collection<Object> coll = getAttributeMappedReferences(cmd, null, pcAttributeName, myAttributeValue, om);
+        Collection<Object> coll = getAttributeMappedReferences(cmd, null, pcAttributeName, myAttributeValue);
         if (coll.iterator().hasNext())
         {
-            Object value = coll.iterator().next();
-            return value;
+            return coll.iterator().next();
         }
 
         // no related object
@@ -429,7 +413,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
     }
 
     private Collection<Object> getAttributeMappedReferences(AbstractClassMetaData cmd, AbstractMemberMetaData mmd,
-            String pcAttributeName, Object myAttributeValue, ExecutionContext om)
+            String pcAttributeName, Object myAttributeValue)
     {
         Collection<Object> coll;
 
@@ -440,16 +424,16 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         }
         else
         {
-            collectionClass = mmd.getType();
-            collectionClass = SCOUtils.getContainerInstanceType(collectionClass, mmd.getOrderMetaData() != null);
+            collectionClass = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
         }
+
         try
         {
             coll = (Collection<Object>) collectionClass.newInstance();
 
             String attributeFilter = "(" + pcAttributeName + "=" + myAttributeValue + ")";
-            LdapName base = LDAPUtils.getSearchBase(cmd, om.getMetaDataManager());
-            List<Object> objects = LDAPUtils.getObjectsOfCandidateType(storeMgr, om, cmd, base, attributeFilter, true, false);
+            LdapName base = LDAPUtils.getSearchBase(cmd, ec.getMetaDataManager());
+            List<Object> objects = LDAPUtils.getObjectsOfCandidateType(storeMgr, ec, cmd, base, attributeFilter, true, false);
 
             coll.addAll(objects);
         }
@@ -465,22 +449,21 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         return coll;
     }
 
-    private void removeAttributeReference(Object fromObject, String attributeName, Object joinAttributeValue, String emptyValue,
-            ExecutionContext om)
+    private void removeAttributeReference(Object fromObject, String attributeName, Object joinAttributeValue, String emptyValue)
     {
         if (fromObject != null)
         {
             // delete reference from old object
-            ObjectProvider fromSM = LDAPUtils.getObjectProviderForObject(fromObject, om, true);
-            LdapName fromDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, fromSM);
+            ObjectProvider fromOP = ec.findObjectProvider(fromObject, true);
+            LdapName fromDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, fromOP);
 
-            if (fromSM.getExecutionContext().getApiAdapter().isDeleted(fromObject))
+            if (fromOP.getExecutionContext().getApiAdapter().isDeleted(fromObject))
             {
                 // this object doesn't exist in LDAP any more
                 return;
             }
 
-            ManagedConnection mconn = storeMgr.getConnection(om);
+            ManagedConnection mconn = storeMgr.getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();
@@ -494,10 +477,8 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         addEmptyValue(emptyValue, attribute);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.DeleteAttributeReference", 
-                                attributeName, joinAttributeValue, fromDN));
-                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes",
-                                fromDN, "REPLACE", attributes));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.DeleteAttributeReference", attributeName, joinAttributeValue, fromDN));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", fromDN, "REPLACE", attributes));
                         }
                         ctx.modifyAttributes(fromDN, DirContext.REPLACE_ATTRIBUTE, attributes);
                     }
@@ -514,22 +495,21 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         }
     }
 
-    private void addAttributeReference(Object toObject, String attributeName, Object joinAttributeValue, String emptyValue,
-            ExecutionContext om)
+    private void addAttributeReference(Object toObject, String attributeName, Object joinAttributeValue, String emptyValue)
     {
         if (toObject != null)
         {
             // add reference to new object
-            ObjectProvider toSM = LDAPUtils.getObjectProviderForObject(toObject, om, true);
-            LdapName toDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, toSM);
+            ObjectProvider toOP = ec.findObjectProvider(toObject, true);
+            LdapName toDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, toOP);
 
-            if (toSM.isInserting())
+            if (toOP.isInserting())
             {
                 // this object doesn't exist in LDAP yet
                 return;
             }
 
-            ManagedConnection mconn = storeMgr.getConnection(om);
+            ManagedConnection mconn = storeMgr.getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();
@@ -546,8 +526,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                     removeEmptyValue(emptyValue, attribute);
                     if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.AddAttributeReference", attributeName,
-                            joinAttributeValue, toDN));
+                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.AddAttributeReference", attributeName, joinAttributeValue, toDN));
                         NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", toDN, "REPLACE", attributes));
                     }
                     ctx.modifyAttributes(toDN, DirContext.REPLACE_ATTRIBUTE, attributes);
@@ -555,7 +534,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             }
             catch (NamingException e)
             {
-                System.out.println(toSM);
+                NucleusLogger.DATASTORE_PERSIST.warn("Exception thrown", e);
                 throw new NucleusDataStoreException(e.getMessage(), e);
             }
             finally

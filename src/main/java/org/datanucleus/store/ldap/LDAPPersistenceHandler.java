@@ -108,7 +108,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             if (parentFieldValue != null)
             {
                 // compose DN using parent DN
-                LDAPUtils.getObjectProviderForObject(parentFieldValue, op.getExecutionContext(), true);
+                op.getExecutionContext().findObjectProvider(parentFieldValue, true);
             }
             else if (locationInfo.dn == null)
             {

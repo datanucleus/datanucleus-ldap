@@ -73,7 +73,7 @@ public class LDAPTransactionEventListener implements TransactionEventListener
             HashSet<Object> insert = new HashSet<Object>(objectsToPersist);
             for (Object pc : insert)
             {
-                LDAPUtils.getObjectProviderForObject(pc, ec, true);
+                ec.findObjectProvider(pc, true);
             }
             objectsToPersist.removeAll(insert);
         }

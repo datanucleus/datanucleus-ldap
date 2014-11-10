@@ -75,19 +75,6 @@ public class LDAPUtils
     public static final String[] NO_ATTRIBUTES = new String[0];
 
     /**
-     * Gets the ObjectProvider for the given object.
-     * @param object the object
-     * @param ec the object manager
-     * @param persist true to persist the object if no state manager exists yet.
-     * @return the state manager for object
-     */
-    public static ObjectProvider getObjectProviderForObject(Object object, ExecutionContext ec, boolean persist)
-    {
-        ObjectProvider smpc = ec.findObjectProvider(object, persist);
-        return smpc;
-    }
-
-    /**
      * Gets the effective class meta data for the given field meta data. This is either the class meta data of field
      * itself or, if the field is a collection type, the class meta data of the collection's elements.
      * @param mmd the field meta data
@@ -282,8 +269,7 @@ public class LDAPUtils
                 if (forceFetchHierarchicalMappedDn)
                 {
                     // search for DN, use parent-DN as base
-                    AbstractClassMetaData parentFieldTypeCmd = ec.getMetaDataManager().getMetaDataForClass(parentFieldMmd.getType(),
-                        ec.getClassLoaderResolver());
+                    AbstractClassMetaData parentFieldTypeCmd = ec.getMetaDataManager().getMetaDataForClass(parentFieldMmd.getType(), ec.getClassLoaderResolver());
                     LdapName base = getSearchBase(parentFieldTypeCmd, ec.getMetaDataManager());
                     String ocFilter = getSearchFilter(cmd);
                     String rdnFilter = "(" + rdn.getType() + "=" + rdn.getValue() + ")";
@@ -294,8 +280,7 @@ public class LDAPUtils
                         DirContext ctx = (DirContext) mconn.getConnection();
                         if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.JNDI.search", base, filter, searchControls
-                                    .getSearchScope()));
+                            NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.JNDI.search", base, filter, searchControls.getSearchScope()));
                         }
                         NamingEnumeration<SearchResult> enumeration = ctx.search(base, filter, searchControls);
                         if (enumeration.hasMoreElements())
@@ -334,7 +319,7 @@ public class LDAPUtils
                     {
                         // compose DN using parent DN
                         boolean detached = ec.getApiAdapter().isDetached(parentFieldValue);
-                        ObjectProvider parentSm = getObjectProviderForObject(parentFieldValue, ec, detached);
+                        ObjectProvider parentSm = ec.findObjectProvider(parentFieldValue, detached);
                         if (parentSm == null)
                         {
                             throw new NucleusObjectNotFoundException("No state manager found for object " + parentFieldValue);
@@ -878,8 +863,7 @@ public class LDAPUtils
     {
         Transaction transaction = ec.getTransaction();
         Map<String, Object> txOptions = transaction.getOptions();
-        LDAPTransactionEventListener listener =
-                (txOptions != null ? (LDAPTransactionEventListener)txOptions.get("LDAPTransactionEventListener") : null);
+        LDAPTransactionEventListener listener = (txOptions != null ? (LDAPTransactionEventListener)txOptions.get("LDAPTransactionEventListener") : null);
         if (listener == null)
         {
             listener = new LDAPTransactionEventListener(ec);
@@ -1063,8 +1047,7 @@ public class LDAPUtils
      * level in the hierarchy. Set to true and it will look to the database.
      * @return Object
      */
-    protected static Object findObjectUsingAID(ExecutionContext ec, Class pcCls, final FieldValues fv,
-            boolean ignoreCache, boolean checkInheritance)
+    protected static Object findObjectUsingAID(ExecutionContext ec, Class pcCls, final FieldValues fv, boolean ignoreCache, boolean checkInheritance)
     {
         // Create ObjectProvider to generate an identity NOTE THIS IS VERY INEFFICIENT
         ObjectProvider op = ec.getNucleusContext().getObjectProviderFactory().newForHollowPopulatedAppId(ec, pcCls, fv);
@@ -1138,8 +1121,7 @@ public class LDAPUtils
     }
 
     public static Map<LdapName, Attributes> getEntries(StoreManager storeMgr, ExecutionContext ec,
-        final AbstractClassMetaData candidateCmd, LdapName base, String additionalFilter, boolean subclasses,
-        boolean ignoreCache)
+        final AbstractClassMetaData candidateCmd, LdapName base, String additionalFilter, boolean subclasses, boolean ignoreCache)
     {
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
@@ -1294,8 +1276,7 @@ public class LDAPUtils
 
     public static void deleteRecursive(LdapName dn, DirContext ctx) throws NamingException
     {
-        // search one-level and delete each
-        // on exception: delete all children recursive
+        // search one-level and delete each, on exception: delete all children recursive
         NamingEnumeration<SearchResult> enumeration = ctx.search(dn, "(objectClass=*)", new SearchControls());
         while (enumeration.hasMoreElements())
         {

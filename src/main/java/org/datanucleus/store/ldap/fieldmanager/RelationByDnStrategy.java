@@ -104,8 +104,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             // TODO: check empty value
             try
             {
-                Object value = attr != null ? LDAPUtils.getObjectByDN(storeMgr, ec, mmd.getType(), (String) attr.get(0)) : null;
-                return value;
+                return (attr != null) ? LDAPUtils.getObjectByDN(storeMgr, ec, mmd.getType(), (String) attr.get(0)) : null;
             }
             catch (NamingException e)
             {
@@ -159,7 +158,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 LdapName myDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, op);
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    addDnReference(value, ownerAttributeName, myDN, emptyValue, ec);
+                    addDnReference(value, ownerAttributeName, myDN, emptyValue);
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
                 {
@@ -170,7 +169,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         for (Object pc : c)
                         {
                             LDAPUtils.unmarkForDeletion(pc, ec);
-                            addDnReference(pc, ownerAttributeName, myDN, emptyValue, ec);
+                            addDnReference(pc, ownerAttributeName, myDN, emptyValue);
                         }
                     }
                 }
@@ -185,7 +184,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 // current object is owner of the relation
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    ObjectProvider pcSM = LDAPUtils.getObjectProviderForObject(value, ec, true);
+                    ObjectProvider pcSM = ec.findObjectProvider(value, true);
                     LdapName pcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM);
                     // attributes.put(new BasicAttribute(name, pcDN.toString()));
                     BasicAttribute attr = new BasicAttribute(ownerAttributeName, pcDN.toString());
@@ -201,7 +200,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         BasicAttribute attr = new BasicAttribute(name);
                         for (Object pc : c)
                         {
-                            ObjectProvider pcSM = LDAPUtils.getObjectProviderForObject(pc, ec, true);
+                            ObjectProvider pcSM = ec.findObjectProvider(pc, true);
                             LdapName pcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM);
                             attr.add(pcDN.toString());
                         }
@@ -246,8 +245,8 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                     {
                         LDAPUtils.markForPersisting(value, ec);
                         LDAPUtils.unmarkForDeletion(value, ec);
-                        removeDnReference(oldValue, ownerAttributeName, myDN, emptyValue, ec);
-                        addDnReference(value, ownerAttributeName, myDN, emptyValue, ec);
+                        removeDnReference(oldValue, ownerAttributeName, myDN, emptyValue);
+                        addDnReference(value, ownerAttributeName, myDN, emptyValue);
                     }
                 }
                 else if (RelationType.isRelationMultiValued(relationType))
@@ -275,13 +274,13 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                             toAdd.removeAll(oldColl);
                             for (Object pc : toAdd)
                             {
-                                addDnReference(pc, ownerAttributeName, myDN, emptyValue, ec);
+                                addDnReference(pc, ownerAttributeName, myDN, emptyValue);
                                 LDAPUtils.unmarkForDeletion(pc, ec);
                             }
                             toRemove.removeAll(coll);
                             for (Object pc : toRemove)
                             {
-                                removeDnReference(pc, ownerAttributeName, myDN, emptyValue, ec);
+                                removeDnReference(pc, ownerAttributeName, myDN, emptyValue);
                                 // cascade-delete/dependent-element
                                 if (mmd.getCollection().isDependentElement())
                                 {
@@ -304,7 +303,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             else
             {
                 Object oldValue = getDnMappedReference(effectiveClassMetaData, ownerAttributeName, op);
-                removeDnReference(oldValue, ownerAttributeName, myDN, emptyValue, ec);
+                removeDnReference(oldValue, ownerAttributeName, myDN, emptyValue);
             }
         }
         else
@@ -315,7 +314,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     // TODO: check empty value
-                    ObjectProvider smpc = LDAPUtils.getObjectProviderForObject(value, ec, true);
+                    ObjectProvider smpc = ec.findObjectProvider(value, true);
                     LDAPUtils.unmarkForDeletion(value, ec);
                     attributes.put(new BasicAttribute(ownerAttributeName, LDAPUtils.getDistinguishedNameForObject(storeMgr, smpc).toString()));
                 }
@@ -348,15 +347,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
 
                             if (oldColl != null)
                             {
-                                Collection<Object> toRemove = null;
-                                if (List.class.isAssignableFrom(instanceType))
-                                {
-                                    toRemove = new ArrayList<Object>(oldColl);
-                                }
-                                else
-                                {
-                                    toRemove = new HashSet<Object>(oldColl);
-                                }
+                                Collection<Object> toRemove = (List.class.isAssignableFrom(instanceType)) ? new ArrayList<Object>(oldColl) : new HashSet<Object>(oldColl);
                                 toRemove.removeAll(coll);
                                 for (Object pc : toRemove)
                                 {
@@ -370,7 +361,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         for (Object pc : coll)
                         {
                             LDAPUtils.unmarkForDeletion(pc, ec);
-                            ObjectProvider smpc = LDAPUtils.getObjectProviderForObject(pc, ec, true);
+                            ObjectProvider smpc = ec.findObjectProvider(pc, true);
                             attr.add(LDAPUtils.getDistinguishedNameForObject(storeMgr, smpc).toString());
                         }
                         addEmptyValue(emptyValue, attr);
@@ -404,8 +395,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         return null;
     }
 
-    private Collection<Object> getDnMappedReferences(AbstractClassMetaData cmd, AbstractMemberMetaData mmd, String pcAttributeName,
-        ObjectProvider sm)
+    private Collection<Object> getDnMappedReferences(AbstractClassMetaData cmd, AbstractMemberMetaData mmd, String pcAttributeName, ObjectProvider sm)
     {
         Collection<Object> coll;
 
@@ -443,15 +433,15 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         return coll;
     }
 
-    private void removeDnReference(Object oldObject, String pcAttributeName, LdapName dn, String emptyValue, ExecutionContext om)
+    private void removeDnReference(Object oldObject, String pcAttributeName, LdapName dn, String emptyValue)
     {
         if (oldObject != null)
         {
             // delete reference from old object
-            ObjectProvider oldPcSM = LDAPUtils.getObjectProviderForObject(oldObject, om, true);
+            ObjectProvider oldPcSM = ec.findObjectProvider(oldObject, true);
             LdapName oldPcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, oldPcSM);
 
-            ManagedConnection mconn = storeMgr.getConnection(om);
+            ManagedConnection mconn = storeMgr.getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();
@@ -466,8 +456,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
                             NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.DeleteDnReference", oldPcDN, dn));
-                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", oldPcDN, "REPLACE",
-                                pcAttributes));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", oldPcDN, "REPLACE", pcAttributes));
                         }
                         ctx.modifyAttributes(oldPcDN, DirContext.REPLACE_ATTRIBUTE, pcAttributes);
                     }
@@ -484,12 +473,12 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         }
     }
 
-    private void addDnReference(Object newObject, String pcAttributeName, LdapName dn, String emptyValue, ExecutionContext om)
+    private void addDnReference(Object newObject, String pcAttributeName, LdapName dn, String emptyValue)
     {
         if (newObject != null)
         {
             // add reference to new object
-            ObjectProvider newPcSM = LDAPUtils.getObjectProviderForObject(newObject, om, true);
+            ObjectProvider newPcSM = ec.findObjectProvider(newObject, true);
             LdapName newPcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, newPcSM);
 
             if (newPcSM.isInserting())
@@ -498,7 +487,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 return;
             }
 
-            ManagedConnection mconn = storeMgr.getConnection(om);
+            ManagedConnection mconn = storeMgr.getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();
