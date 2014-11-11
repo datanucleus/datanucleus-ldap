@@ -41,7 +41,6 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class SimpleMappingStrategy extends AbstractMappingStrategy
 {
-
     public SimpleMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);

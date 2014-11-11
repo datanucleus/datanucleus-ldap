@@ -195,14 +195,16 @@ public class LDAPUtils
     private static Rdn getRdnForObject(StoreManager storeMgr, ObjectProvider op) throws InvalidNameException
     {
         AbstractClassMetaData cmd = op.getClassMetaData();
+        // TODO Cater for composite PK
         int fieldNumber = cmd.getPKMemberPositions()[0];
         Object value = op.provideField(fieldNumber);
         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         Attributes rdnAttributes = new BasicAttributes();
+
         AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, op, mmd, rdnAttributes);
         ms.insert(value);
-        Rdn rdn = new Rdn(rdnAttributes);
-        return rdn;
+
+        return new Rdn(rdnAttributes);
     }
 
     /**
@@ -639,9 +641,7 @@ public class LDAPUtils
             AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, op, pcMmd, pcAttributes);
             ms.insert(pcFieldValue);
             Attribute pcAttribute = pcAttributes.get(attributeName);
-            Object pcAttributeValue = pcAttribute.get();
-
-            return pcAttributeValue;
+            return pcAttribute.get();
         }
         catch (NamingException e)
         {

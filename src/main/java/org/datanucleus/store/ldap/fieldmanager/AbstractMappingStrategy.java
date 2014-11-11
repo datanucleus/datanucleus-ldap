@@ -111,7 +111,7 @@ public abstract class AbstractMappingStrategy
      */
     public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
     {
-        MetaDataManager mmgr = op.getExecutionContext().getMetaDataManager();
+        MetaDataManager mmgr = storeMgr.getMetaDataManager();
 
         // TODO Replace this ghastly check. mmd.getRelationType tells you if it is a relation or not! nothing more needed
         AbstractClassMetaData effectiveClassMetaData = LDAPUtils.getEffectiveClassMetaData(mmd, mmgr);
@@ -147,7 +147,7 @@ public abstract class AbstractMappingStrategy
                 }
             }
 
-            TypeConverter converter = op.getExecutionContext().getTypeManager().getTypeConverterForType(type, String.class);
+            TypeConverter converter = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(type, String.class);
             if (converter != null)
             {
                 // TODO Use the converter in the mapping strategy since we took time to get it

@@ -31,11 +31,8 @@ import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 public class StoreFieldManager extends AbstractFieldManager
 {
     ObjectProvider op;
-    
     StoreManager storeMgr;
-
     Attributes attributes;
-
     boolean insert;
 
     public StoreFieldManager(StoreManager storeMgr, ObjectProvider sm, Attributes attrs, boolean insert)
@@ -69,8 +66,7 @@ public class StoreFieldManager extends AbstractFieldManager
         }
 
         // TODO Localise this
-        throw new NucleusException(
-                "Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + " is not supported for this datastore");
+        throw new NucleusException("Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + " is not supported for this datastore");
     }
 
     public void storeBooleanField(int fieldNumber, boolean value)

@@ -59,10 +59,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     protected ClassLoaderResolver clr;
 
-    protected EmbeddedMappingStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, 
-            Attributes attributes)
+    protected EmbeddedMappingStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
     {
-        super(sm, mmd, attributes);
+        super(op, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
         this.storeMgr = storeMgr;
         this.clr = ec.getClassLoaderResolver();
@@ -75,19 +74,15 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         RelationType relType = mmd.getRelationType(clr);
         if (relType == RelationType.ONE_TO_ONE_UNI || relType == RelationType.ONE_TO_ONE_BI)
         {
-            Object value = null;
             Set<String> objectClasses = LDAPUtils.getObjectClassesForClass(effectiveClassMetaData);
             if (objectClasses.isEmpty())
             {
                 // embedded into the current entry
-                value = fetchEmbedded();
+                return fetchEmbedded();
             }
-            else
-            {
-                // embedded as child-entry
-                value = fetchFromChild();
-            }
-            return value;
+
+            // embedded as child-entry
+            return fetchFromChild();
         }
         else if (relType == RelationType.ONE_TO_MANY_UNI || relType == RelationType.ONE_TO_MANY_BI)
         {
@@ -101,8 +96,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         }
 
         // TODO Localise this
-        throw new NucleusException(
-                "Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
+        throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
 
     }
 
@@ -116,15 +110,14 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
 
         // use field meta data from embedded meta data
-        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(
-                Arrays.asList(embeddedMetaData.getMemberMetaData()));
+        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
 
         // TODO Provide the owner in this call
         ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
         // TODO Why get SM just after creating it????
         embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
-        Object value = fetchMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
-        return value;
+
+        return fetchMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
     }
 
     /**
@@ -134,8 +127,8 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     private Object fetchFromChild()
     {
         // use embedded meta data from field
-        EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
-        Collection<Object> children = fetchFromChildren(ArrayList.class, mmd, embeddedMetaData);
+        Collection<Object> children = fetchFromChildren(ArrayList.class, mmd, mmd.getEmbeddedMetaData());
+
         if (children.size() == 0)
         {
             return null;
@@ -158,8 +151,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     private Collection<Object> fetchFromChildren(Class collectionType)
     {
         // use embedded meta data from element
-        EmbeddedMetaData embeddedMetaData = mmd.getElementMetaData().getEmbeddedMetaData();
-        return fetchFromChildren(collectionType, mmd, embeddedMetaData);
+        return fetchFromChildren(collectionType, mmd, mmd.getElementMetaData().getEmbeddedMetaData());
     }
 
     private Collection<Object> fetchFromChildren(Class collectionType, AbstractMemberMetaData mmd, EmbeddedMetaData embeddedMetaData)
@@ -213,8 +205,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         return coll;
     }
 
-    private Object fetchMerge(ObjectProvider embeddedSM, Attributes embeddedAttrs, List<AbstractMemberMetaData> embeddedMmds,
-            EmbeddedMetaData embeddedMetaData)
+    private Object fetchMerge(ObjectProvider embeddedSM, Attributes embeddedAttrs, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData)
     {
         if (embeddedAttrs != null && embeddedMmds != null)
         {
@@ -229,14 +220,12 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
                 if (fieldName.equals(embeddedMetaData.getOwnerMember()))
                 {
-                    Object embeddedValue = op.getObject();
-                    embeddedSM.replaceField(i, embeddedValue);
+                    embeddedSM.replaceField(i, op.getObject());
                 }
                 else if (embeddedMmd.isPrimaryKey())
                 {
                     AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
-                    Object embeddedValue = ms.fetch();
-                    embeddedSM.replaceField(i, embeddedValue);
+                    embeddedSM.replaceField(i, ms.fetch());
                 }
             }
             // Then other fields
@@ -335,8 +324,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         else
         {
             // TODO Localise this
-            throw new NucleusException(
-                "Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + 
+            throw new NucleusException("Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + 
                 " with relation type " + mmd.getRelationType(clr) + " is not supported for this datastore");
         }
     }
@@ -345,8 +333,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     {
         ObjectProvider embeddedSM = getEmbeddedObjectProvider(value);
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
-        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData
-                .getMemberMetaData()));
+        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
         insertMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
     }
 
@@ -390,8 +377,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         insertMerge(embeddedSM, embeddedAttributes, embeddedMmds, embeddedMetaData);
     }
 
-    private void insertMerge(ObjectProvider embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds,
-            EmbeddedMetaData embeddedMetaData)
+    private void insertMerge(ObjectProvider embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData)
     {
         AbstractClassMetaData embeddedCmd = embeddedSM.getClassMetaData();
 
@@ -409,8 +395,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             else if (embeddedMmd.isPrimaryKey())
             {
                 AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
-                Object embeddedValue = embeddedSM.provideField(i);
-                ms.insert(embeddedValue);
+                ms.insert(embeddedSM.provideField(i));
             }
         }
 
@@ -422,8 +407,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
             {
                 AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
-                Object embeddedValue = embeddedSM.provideField(i);
-                ms.insert(embeddedValue);
+                ms.insert(embeddedSM.provideField(i));
             }
         }
     }
@@ -499,8 +483,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 }
 
                 EmbeddedMetaData embeddedMetaData = mmd.getElementMetaData().getEmbeddedMetaData();
-                Class oldCollInstanceType = org.datanucleus.store.types.SCOUtils.getContainerInstanceType(mmd.getType(),
-                    mmd.getOrderMetaData() != null);
+                Class oldCollInstanceType = org.datanucleus.store.types.SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
                 Collection<Object> oldColl = fetchFromChildren(oldCollInstanceType, mmd, embeddedMetaData);
                 LinkedHashMap<LdapName, Object> oldMap = new LinkedHashMap<LdapName, Object>();
                 for (Object oldObject : oldColl)
@@ -558,9 +541,8 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         else
         {
             // TODO Localise this
-            throw new NucleusException(
-                "Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + " with relation type " + mmd
-                .getRelationType(clr) + " is not supported for this datastore");
+            throw new NucleusException("Field " + mmd.getFullFieldName() + " cannot be persisted because type=" + mmd.getTypeName() + " with relation type " + mmd.getRelationType(clr) + 
+                " is not supported for this datastore");
         }
     }
 
@@ -639,13 +621,11 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         }
 
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
-        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData
-                .getMemberMetaData()));
+        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
         updateMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData, insert);
     }
 
-    private void updateMerge(ObjectProvider embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds,
-            EmbeddedMetaData embeddedMetaData, boolean insert)
+    private void updateMerge(ObjectProvider embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData, boolean insert)
     {
         AbstractClassMetaData embeddedCmd = embeddedSM.getClassMetaData();
 
@@ -657,14 +637,12 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
             if (fieldName.equals(embeddedMetaData.getOwnerMember()))
             {
-                Object embeddedValue = op.getObject();
-                embeddedSM.replaceField(i, embeddedValue);
+                embeddedSM.replaceField(i, op.getObject());
             }
             else if (embeddedMmd.isPrimaryKey())
             {
                 AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
-                Object embeddedValue = embeddedSM.provideField(i);
-                ms.update(embeddedValue);
+                ms.update(embeddedSM.provideField(i));
             }
         }
 
@@ -710,11 +688,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             embeddedMetaData = mmd.getElementMetaData().getEmbeddedMetaData();
         }
 
-        
         if (embeddedMetaData != null)
         {
-            List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData
-                    .getMemberMetaData()));
+            List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
             // TODO Populate the owner object in this call
             ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
@@ -722,8 +698,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, new BasicAttributes());
                 if (ms != null)
                 {
-                    List<String> embeddedAttributeNames = ms.getAttributeNames();
-                    names.addAll(embeddedAttributeNames);
+                    names.addAll(ms.getAttributeNames());
                 }
             }
         }

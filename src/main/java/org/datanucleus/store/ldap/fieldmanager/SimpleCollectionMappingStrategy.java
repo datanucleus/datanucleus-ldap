@@ -36,7 +36,6 @@ import org.datanucleus.store.types.converters.TypeConverter;
 
 public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
 {
-
     public SimpleCollectionMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
@@ -45,6 +44,7 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
         // For now, each collection element is persisted as its own attribute value
         if (mmd.getJoinMetaData() == null)
         {
+            // TODO Drop this hack. Using join as way of saying don't serialise
             mmd.setJoinMetaData(new JoinMetaData());
         }
     }
@@ -69,19 +69,14 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
 
         Object[] values = null;
 
-        // check null
         if (attr == null)
         {
             values = new Object[0];
         }
-
-        // check String
         else if (String.class.isAssignableFrom(type))
         {
             values = fetchStringArrayField();
         }
-
-        // check wrappers of primitives
         else if (Boolean.class.isAssignableFrom(type))
         {
             values = fetchBooleanObjectArrayField();
@@ -148,8 +143,7 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
         {
             collection.addAll(Arrays.asList(values));
 
-            int fieldNumber = op.isEmbedded() ? op.getClassMetaData().getAbsolutePositionOfMember(mmd.getName()) : mmd
-                    .getAbsoluteFieldNumber();
+            int fieldNumber = op.isEmbedded() ? op.getClassMetaData().getAbsolutePositionOfMember(mmd.getName()) : mmd.getAbsoluteFieldNumber();
             op.setAssociatedValue("COLL" + fieldNumber, collection);
             return op.wrapSCOField(fieldNumber, collection, false, false, true);
         }
@@ -160,13 +154,11 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
 
     public void insert(Object value)
     {
-        // check null
         if (value == null)
         {
             return;
         }
 
-        // check empty
         Collection<Object> valueCollection = (Collection<Object>) value;
         if (valueCollection.isEmpty())
         {
@@ -178,7 +170,6 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
 
     public void update(Object value)
     {
-        // check null
         if (value == null)
         {
             return;
@@ -192,13 +183,10 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
         Collection<Object> valueCollection = (Collection<Object>) value;
         Object[] values = valueCollection.toArray();
 
-        // check String
         if (String.class.isAssignableFrom(type))
         {
             storeObjectArrayField(values);
         }
-
-        // check wrappers of primitives
         else if (Boolean.class.isAssignableFrom(type))
         {
             storeBooleanObjectArrayField(valueCollection.toArray(new Boolean[0]));

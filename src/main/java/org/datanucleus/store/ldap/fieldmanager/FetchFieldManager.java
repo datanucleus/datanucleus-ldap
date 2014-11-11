@@ -31,7 +31,6 @@ import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 public class FetchFieldManager extends AbstractFieldManager
 {
     ObjectProvider op;
-
     StoreManager storeMgr;
     Attributes result;
 
@@ -57,10 +56,9 @@ public class FetchFieldManager extends AbstractFieldManager
         {
             return ms.fetch();
         }
-        
+
         // TODO Localise this
-        throw new NucleusException(
-                "Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
+        throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
     }
 
     public boolean fetchBooleanField(int fieldNumber)
