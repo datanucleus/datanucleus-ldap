@@ -102,6 +102,7 @@ public abstract class AbstractMappingStrategy
 
     /**
      * Finds the mapping strategy for the specified field of the state manager.
+     * TODO We should remove ObjectProvider from XXXMappingStrategy since it is the same for all instances of a particular field, not per object.
      * @param storeMgr Store Manager
      * @param op state manager
      * @param mmd Metadata for the member
@@ -111,8 +112,9 @@ public abstract class AbstractMappingStrategy
     public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
     {
         MetaDataManager mmgr = op.getExecutionContext().getMetaDataManager();
-        AbstractClassMetaData effectiveClassMetaData = LDAPUtils.getEffectiveClassMetaData(mmd, mmgr);
 
+        // TODO Replace this ghastly check. mmd.getRelationType tells you if it is a relation or not! nothing more needed
+        AbstractClassMetaData effectiveClassMetaData = LDAPUtils.getEffectiveClassMetaData(mmd, mmgr);
         if (effectiveClassMetaData == null)
         {
             Class type = mmd.getType();
@@ -148,6 +150,7 @@ public abstract class AbstractMappingStrategy
             TypeConverter converter = op.getExecutionContext().getTypeManager().getTypeConverterForType(type, String.class);
             if (converter != null)
             {
+                // TODO Use the converter in the mapping strategy since we took time to get it
                 if (isArray)
                 {
                     return new SimpleArrayMappingStrategy(op, mmd, attributes);
@@ -167,6 +170,7 @@ public abstract class AbstractMappingStrategy
 
         if (LDAPUtils.isEmbeddedField(mmd))
         {
+            // TODO See MetaDataUtils.isMemberEmbedded for a better embedded field test
             return new EmbeddedMappingStrategy(storeMgr, op, mmd, attributes);
         }
 
