@@ -29,6 +29,7 @@ import org.datanucleus.store.ldap.LDAPUtils;
 
 /**
  * Basic class for all mapping strategies. A mapping strategy is used to map values to LDAP attributes and entries.
+ * TODO Remove ObjectProvider from this since it is currently creating one of these per field per object!!
  */
 public abstract class AbstractMappingStrategy
 {

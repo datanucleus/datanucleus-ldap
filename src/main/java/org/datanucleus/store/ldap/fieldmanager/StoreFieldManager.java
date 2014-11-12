@@ -141,6 +141,7 @@ public class StoreFieldManager extends AbstractFieldManager
                 else
                 {
                     // Support for TypeConverter
+                    // Support user-specified type converter
                     TypeConverter converter = null;
                     if (Date.class.isAssignableFrom(mmd.getType()))
                     {

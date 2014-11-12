@@ -39,7 +39,6 @@ public class MappingStrategyHelper
 {
     /**
      * Finds the mapping strategy for the specified field of the state manager.
-     * TODO We should remove ObjectProvider from XXXMappingStrategy since it is the same for all instances of a particular field, not per object.
      * @param storeMgr Store Manager
      * @param op state manager
      * @param mmd Metadata for the member
@@ -49,8 +48,6 @@ public class MappingStrategyHelper
     public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
     {
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
-
-        // TODO Replace this ghastly check. mmd.getRelationType tells you if it is a relation or not! nothing more needed
         ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
         RelationType relType = mmd.getRelationType(clr);
         if (relType == RelationType.NONE)
