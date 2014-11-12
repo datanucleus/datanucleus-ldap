@@ -50,6 +50,7 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -141,8 +142,7 @@ public class LDAPUtils
 
     public static List<AbstractMemberMetaData> getAllMemberMetaData(AbstractClassMetaData cmd)
     {
-        int[] fieldNumbers = cmd.getAllMemberPositions();
-        return getMemberMetaData(fieldNumbers, cmd);
+        return getMemberMetaData(cmd.getAllMemberPositions(), cmd);
     }
 
     public static List<AbstractMemberMetaData> getMemberMetaData(int[] fieldNumbers, AbstractClassMetaData cmd)
@@ -634,6 +634,10 @@ public class LDAPUtils
         {
             // get field value of the PC
             AbstractMemberMetaData pcMmd = LDAPUtils.getMemberMetadataForAttributeName(op.getClassMetaData(), attributeName);
+            if (pcMmd == null)
+            {
+                throw new NucleusUserException("Tried to find LDAP attribute " + attributeName + " in class " + op.getClassMetaData().getFullClassName() + " but not found. Metadata wrong?");
+            }
             Object pcFieldValue = op.provideField(pcMmd.getAbsoluteFieldNumber());
 
             // get LDAP value
@@ -830,12 +834,11 @@ public class LDAPUtils
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
         {
-            DirContext ctx = (DirContext) mconn.getConnection();
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.rename", oldDn, newDn));
             }
-            ctx.rename(oldDn, newDn);
+            ((DirContext) mconn.getConnection()).rename(oldDn, newDn);
         }
         catch (NamingException e)
         {
@@ -927,10 +930,8 @@ public class LDAPUtils
                     String className = "org.datanucleus.store.ldap.query.QueryToLDAPFilterMapper";
                     Class cls = ec.getClassLoaderResolver().classForName(className);
                     Method method = ClassUtils.getMethodForClass(cls, "compile", null);
-                    Constructor constr = ClassUtils.getConstructorWithArguments(cls, new Class[]{QueryCompilation.class, Map.class,
-                            AbstractClassMetaData.class});
-                    String filter = (String) method
-                            .invoke(constr.newInstance(new Object[]{compilation, parameters, acmd}), (Object[]) null);
+                    Constructor constr = ClassUtils.getConstructorWithArguments(cls, new Class[]{QueryCompilation.class, Map.class, AbstractClassMetaData.class});
+                    String filter = (String) method.invoke(constr.newInstance(new Object[]{compilation, parameters, acmd}), (Object[]) null);
 
                     results = getObjectsOfCandidateType(storeMgr, ec, acmd, null, filter, ignoreCache);
                 }
@@ -1221,8 +1222,7 @@ public class LDAPUtils
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
         {
-            DirContext ctx = (DirContext) mconn.getConnection();
-            ctx.bind(dn, null, attributes);
+            ((DirContext) mconn.getConnection()).bind(dn, null, attributes);
         }
         catch (NamingException ne)
         {
@@ -1243,8 +1243,7 @@ public class LDAPUtils
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
         {
-            DirContext ctx = (DirContext) mconn.getConnection();
-            ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
+            ((DirContext) mconn.getConnection()).modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
         }
         catch (NamingException ne)
         {
@@ -1261,8 +1260,7 @@ public class LDAPUtils
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
         {
-            DirContext ctx = (DirContext) mconn.getConnection();
-            deleteRecursive(dn, ctx);
+            deleteRecursive(dn, (DirContext) mconn.getConnection());
         }
         catch (NamingException ne)
         {

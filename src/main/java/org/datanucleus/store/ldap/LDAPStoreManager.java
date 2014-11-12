@@ -36,6 +36,9 @@ import org.datanucleus.util.Localiser;
  */
 public class LDAPStoreManager extends AbstractStoreManager
 {
+    /** Extension for metadata of a field/property to define the mapping strategy to use. */
+    public static final String MAPPING_STRATEGY_EXTENSON = "mapping-strategy";
+
     static
     {
         Localiser.registerBundle("org.datanucleus.store.ldap.Localisation", LDAPStoreManager.class.getClassLoader());

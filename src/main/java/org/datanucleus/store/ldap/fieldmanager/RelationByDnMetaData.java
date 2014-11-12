@@ -21,6 +21,7 @@ package org.datanucleus.store.ldap.fieldmanager;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.ldap.LDAPUtils.LocationInfo;
 
@@ -136,6 +137,23 @@ public class RelationByDnMetaData
 
     public static boolean isRelationByDn(AbstractMemberMetaData mmd, MetaDataManager mmgr)
     {
+        if (mmd.hasExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON))
+        {
+            // User has specified the mapping-strategy explicitly via extension
+            String mappingStrategy = mmd.getValueForExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON);
+            if (mappingStrategy != null)
+            {
+                if (mappingStrategy.equalsIgnoreCase("attribute"))
+                {
+                    return false;
+                }
+                else if (mappingStrategy.equalsIgnoreCase("dn"))
+                {
+                    return true;
+                }
+            }
+        }
+
         // no join
         // no {} in dn extension or table
         RelationByDnMetaData md = new RelationByDnMetaData(mmd, mmgr);

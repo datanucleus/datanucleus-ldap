@@ -31,6 +31,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -174,6 +175,24 @@ public abstract class AbstractMappingStrategy
             return new EmbeddedMappingStrategy(storeMgr, op, mmd, attributes);
         }
 
+        if (mmd.hasExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON))
+        {
+            // User has specified the mapping-strategy explicitly via extension so use that
+            String mappingStrategy = mmd.getValueForExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON);
+            if (mappingStrategy != null)
+            {
+                if (mappingStrategy.equalsIgnoreCase("dn"))
+                {
+                    return new RelationByDnStrategy(storeMgr, op, mmd, attributes);
+                }
+                else if (mappingStrategy.equalsIgnoreCase("attribute"))
+                {
+                    return new RelationByAttributeStrategy(storeMgr, op, mmd, attributes);
+                }
+            }
+        }
+
+        // Fallback to deciding based on "join" and other such nonsense
         boolean isRelationByAttribute = RelationByAttributeMetaData.isRelationByAttribute(mmd, mmgr);
         if (isRelationByAttribute)
         {

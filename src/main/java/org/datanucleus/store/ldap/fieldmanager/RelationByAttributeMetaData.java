@@ -16,13 +16,13 @@ limitations under the License.
 Contributors :
  ...
  ***********************************************************************/
-
 package org.datanucleus.store.ldap.fieldmanager;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.JoinMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 
 /**
@@ -30,7 +30,6 @@ import org.datanucleus.store.ldap.LDAPUtils;
  */
 public class RelationByAttributeMetaData
 {
-
     private AbstractMemberMetaData mmd;
 
     private AbstractMemberMetaData otherMmd;
@@ -159,6 +158,24 @@ public class RelationByAttributeMetaData
 
     public static boolean isRelationByAttribute(AbstractMemberMetaData mmd, MetaDataManager mmgr)
     {
+        if (mmd.hasExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON))
+        {
+            // User has specified the mapping-strategy explicitly via extension
+            String mappingStrategy = mmd.getValueForExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON);
+            if (mappingStrategy != null)
+            {
+                if (mappingStrategy.equalsIgnoreCase("attribute"))
+                {
+                    return true;
+                }
+                else if (mappingStrategy.equalsIgnoreCase("dn"))
+                {
+                    return false;
+                }
+            }
+        }
+
+        // Fallback to the check based on "join"
         return new RelationByAttributeMetaData(mmd, mmgr).joinMetaData != null;
     }
 }

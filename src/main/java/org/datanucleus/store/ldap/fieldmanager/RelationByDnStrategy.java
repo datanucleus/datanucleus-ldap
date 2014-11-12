@@ -34,6 +34,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
@@ -60,8 +61,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
 
     protected RelationByDnMetaData mappingMetaData;
 
-    protected RelationByDnStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, 
-            Attributes attributes)
+    protected RelationByDnStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
@@ -69,6 +69,11 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         this.clr = ec.getClassLoaderResolver();
         this.effectiveClassMetaData = LDAPUtils.getEffectiveClassMetaData(mmd, ec.getMetaDataManager());
         this.mappingMetaData = new RelationByDnMetaData(mmd, ec.getMetaDataManager());
+        if (mappingMetaData.getOwnerAttributeName() == null)
+        {
+            // Sanity check on metadata
+            throw new NucleusUserException("Member " + mmd.getFullFieldName() + " stores multiple values and has owner LDAP attribute as NULL. The metadata is incorrect and needs to set this.");
+        }
     }
 
     public Object fetch()
@@ -125,8 +130,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                     removeEmptyValue(emptyValue, attr);
                     for (int i = 0; attr != null && i < attr.size(); i++)
                     {
-                        String value = (String) attr.get(i);
-                        coll.add(LDAPUtils.getObjectByDN(storeMgr, ec, elementType, value));
+                        coll.add(LDAPUtils.getObjectByDN(storeMgr, ec, elementType, (String) attr.get(i)));
                     }
                 }
                 catch (NamingException e)
@@ -175,8 +179,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
-                        mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
             else
@@ -201,8 +204,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         for (Object pc : c)
                         {
                             ObjectProvider pcSM = ec.findObjectProvider(pc, true);
-                            LdapName pcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM);
-                            attr.add(pcDN.toString());
+                            attr.add(LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM).toString());
                         }
                         addEmptyValue(emptyValue, attr);
                         if (attr.size() > 0)
@@ -213,8 +215,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
-                        mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
         }
@@ -296,14 +297,12 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 }
                 else
                 {
-                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported",
-                        mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
+                    throw new NucleusException(Localiser.msg("LDAP.Persist.RelationTypeNotSupported", mmd.getFullFieldName(), mmd.getTypeName(), mmd.getRelationType(clr)));
                 }
             }
             else
             {
-                Object oldValue = getDnMappedReference(effectiveClassMetaData, ownerAttributeName, op);
-                removeDnReference(oldValue, ownerAttributeName, myDN, emptyValue);
+                removeDnReference(getDnMappedReference(effectiveClassMetaData, ownerAttributeName, op), ownerAttributeName, myDN, emptyValue);
             }
         }
         else
@@ -498,7 +497,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                     attribute = new BasicAttribute(pcAttributeName);
                     attributes.put(attribute);
                 }
-                if(!attribute.contains(dn.toString()))
+                if (!attribute.contains(dn.toString()))
                 {
                     attribute.add(dn.toString());
                     removeEmptyValue(emptyValue, attribute);
@@ -512,7 +511,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             }
             catch (NamingException e)
             {
-                System.out.println(newPcSM);
+                NucleusLogger.DATASTORE_PERSIST.warn("Exception adding DN reference", e);
                 throw new NucleusDataStoreException(e.getMessage(), e);
             }
             finally
