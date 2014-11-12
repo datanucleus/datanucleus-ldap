@@ -224,6 +224,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 }
                 else if (embeddedMmd.isPrimaryKey())
                 {
+                    // TODO If no mapping strategy then use FetchFieldManager (embedded)
                     AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
                     embeddedSM.replaceField(i, ms.fetch());
                 }
@@ -237,6 +238,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
                 if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
                 {
+                    // TODO If no mapping strategy then use FetchFieldManager (embedded)
                     AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
                     Object embeddedValue = ms.fetch();
 
@@ -394,6 +396,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             }
             else if (embeddedMmd.isPrimaryKey())
             {
+                // TODO If no mapping strategy then use StoreFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 ms.insert(embeddedSM.provideField(i));
             }
@@ -406,6 +409,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
             if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
             {
+                // TODO If no mapping strategy then use StoreFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 ms.insert(embeddedSM.provideField(i));
             }
@@ -641,6 +645,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             }
             else if (embeddedMmd.isPrimaryKey())
             {
+                // TODO If no mapping strategy then use FetchFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 ms.update(embeddedSM.provideField(i));
             }
@@ -655,6 +660,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
             {
                 int i = embeddedCmd.getAbsolutePositionOfMember(fieldName);
+                // TODO If no mapping strategy then use FetchFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 Object embeddedValue = embeddedSM.provideField(i);
                 if (insert || LDAPUtils.isEmbeddedField(embeddedMmd) || dirtyFieldNameList.contains(fieldName))
@@ -695,6 +701,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
             {
+                // TODO If no mapping strategy then use FetchFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, new BasicAttributes());
                 if (ms != null)
                 {

@@ -474,8 +474,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                 if (RelationByDnMetaData.isRelationByDn(mmd, op.getExecutionContext().getMetaDataManager()))
                 {
                     AbstractClassMetaData effectiveCmd = LDAPUtils.getEffectiveClassMetaData(mmd, op.getExecutionContext().getMetaDataManager());
-                    String[] subclassNames = effectiveCmd != null ? op.getExecutionContext().getMetaDataManager().getSubclassesForClass(
-                        effectiveCmd.getFullClassName(), true) : null;
+                    String[] subclassNames = effectiveCmd != null ? op.getExecutionContext().getMetaDataManager().getSubclassesForClass(effectiveCmd.getFullClassName(), true) : null;
                     if (effectiveCmd == op.getClassMetaData() || (subclassNames != null && Arrays.asList(subclassNames).contains(
                         op.getClassMetaData().getFullClassName())))
                     {
@@ -632,8 +631,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * @param op ObjectProvider
      * @param emptyValue the value used for an empty member attribute
      */
-    private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue,
-            ObjectProvider op, Object emptyValue)
+    private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue, ObjectProvider op, Object emptyValue)
     {
         // search for object with (pcAttributeName=myDN)
         ExecutionContext om = op.getExecutionContext();
@@ -724,8 +722,17 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
             AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, new BasicAttributes());
-            List<String> attributeNames = ms.getAttributeNames();
-            attributeNameList.addAll(attributeNames);
+            if (ms == null)
+            {
+                // Basic type
+                String name = LDAPUtils.getAttributeNameForField(mmd);
+                attributeNameList.add(name);
+            }
+            else
+            {
+                List<String> attributeNames = ms.getAttributeNames();
+                attributeNameList.addAll(attributeNames);
+            }
         }
         String[] attributeNames = attributeNameList.toArray(new String[0]);
 

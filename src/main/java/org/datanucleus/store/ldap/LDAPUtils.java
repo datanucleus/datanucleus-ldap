@@ -62,9 +62,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.ldap.fieldmanager.AbstractMappingStrategy;
 import org.datanucleus.store.ldap.fieldmanager.FetchFieldManager;
-import org.datanucleus.store.ldap.fieldmanager.MappingStrategyHelper;
+import org.datanucleus.store.ldap.fieldmanager.StoreFieldManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -198,12 +197,14 @@ public class LDAPUtils
         AbstractClassMetaData cmd = op.getClassMetaData();
         // TODO Cater for composite PK
         int fieldNumber = cmd.getPKMemberPositions()[0];
-        Object value = op.provideField(fieldNumber);
-        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+//        Object value = op.provideField(fieldNumber);
+//        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         Attributes rdnAttributes = new BasicAttributes();
 
-        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, rdnAttributes);
-        ms.insert(value);
+        StoreFieldManager storeFM = new StoreFieldManager(storeMgr, op, rdnAttributes, true);
+        op.provideFields(new int[]{fieldNumber}, storeFM);
+//        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, rdnAttributes);
+//        ms.insert(value);
 
         return new Rdn(rdnAttributes);
     }
@@ -623,7 +624,7 @@ public class LDAPUtils
      */
 
     /**
-     * Gets the attribute value of an specific attribute name from the state manager.
+     * Gets the attribute value of an specific attribute name from the ObjectProvider.
      * @param storeMgr Store Manager
      * @param op ObjectProvider
      * @param attributeName the attribute name
@@ -639,12 +640,11 @@ public class LDAPUtils
             {
                 throw new NucleusUserException("Tried to find LDAP attribute " + attributeName + " in class " + op.getClassMetaData().getFullClassName() + " but not found. Metadata wrong?");
             }
-            Object pcFieldValue = op.provideField(pcMmd.getAbsoluteFieldNumber());
 
             // get LDAP value
             Attributes pcAttributes = new BasicAttributes();
-            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, pcMmd, pcAttributes);
-            ms.insert(pcFieldValue);
+            StoreFieldManager storeFM = new StoreFieldManager(storeMgr, op, pcAttributes, true);
+            op.provideFields(new int[]{pcMmd.getAbsoluteFieldNumber()}, storeFM);
             Attribute pcAttribute = pcAttributes.get(attributeName);
             return pcAttribute.get();
         }
