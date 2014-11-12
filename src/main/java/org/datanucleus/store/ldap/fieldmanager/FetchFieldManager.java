@@ -19,6 +19,7 @@ package org.datanucleus.store.ldap.fieldmanager;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 
 import javax.naming.NamingException;
@@ -26,6 +27,7 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -43,6 +45,7 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class FetchFieldManager extends AbstractFieldManager
 {
+    ExecutionContext ec;
     ObjectProvider op;
     StoreManager storeMgr;
     Attributes result;
@@ -51,6 +54,7 @@ public class FetchFieldManager extends AbstractFieldManager
     // use of deprecated EC.findObjectUsingAID. This would mean that all XXXMappingStrategy take in ExecutionContext
     public FetchFieldManager(StoreManager storeMgr, ObjectProvider op, Attributes result)
     {
+        this.ec = op.getExecutionContext();
         this.op = op;
         this.storeMgr = storeMgr;
         this.result = result;
@@ -67,11 +71,16 @@ public class FetchFieldManager extends AbstractFieldManager
         {
             if (mmd.hasCollection())
             {
-                // Handled by MappingStrategy currently
+                Collection coll = SimpleContainerHelper.fetchCollection(mmd, attr, ec.getTypeManager(), clr);
+                return op.wrapSCOField(fieldNumber, coll, false, false, true);
             }
             else if (mmd.hasArray())
             {
-                // Handled by MappingStrategy currently
+                if (attr == null)
+                {
+                    return null;
+                }
+                return SimpleContainerHelper.fetchArray(mmd, attr, ec.getTypeManager());
             }
             else if (mmd.hasMap())
             {
@@ -147,7 +156,7 @@ public class FetchFieldManager extends AbstractFieldManager
                     }
                     else
                     {
-                        converter = op.getExecutionContext().getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
+                        converter = ec.getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
                     }
                     if (converter != null)
                     {

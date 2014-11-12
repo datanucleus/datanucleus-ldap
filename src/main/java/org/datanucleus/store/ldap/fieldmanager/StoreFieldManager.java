@@ -18,8 +18,10 @@ Contributors:
 package org.datanucleus.store.ldap.fieldmanager;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 
+import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 
@@ -45,9 +47,9 @@ public class StoreFieldManager extends AbstractFieldManager
     Attributes attributes;
     boolean insert;
 
-    public StoreFieldManager(StoreManager storeMgr, ObjectProvider sm, Attributes attrs, boolean insert)
+    public StoreFieldManager(StoreManager storeMgr, ObjectProvider op, Attributes attrs, boolean insert)
     {
-        this.op = sm;
+        this.op = op;
         this.storeMgr = storeMgr;
         this.attributes = attrs;
         this.insert = insert;
@@ -61,14 +63,40 @@ public class StoreFieldManager extends AbstractFieldManager
         RelationType relType = mmd.getRelationType(clr);
         if (relType == RelationType.NONE)
         {
-            // TODO Handle all basic types here and only use strategy for relation fields
             if (mmd.hasCollection())
             {
-                // Handled by MappingStrategy currently
+                Collection<Object> valueCollection = (Collection<Object>) value;
+                if (value == null)
+                {
+                    return;
+                }
+                else if (valueCollection.isEmpty() && insert)
+                {
+                    return;
+                }
+                else
+                {
+                    Attribute attr = SimpleContainerHelper.storeCollection(mmd, value, op.getExecutionContext().getTypeManager(), clr);
+                    attributes.put(attr);
+                }
+                return;
             }
             else if (mmd.hasArray())
             {
-                // Handled by MappingStrategy currently
+                if (value == null)
+                {
+                    if (insert)
+                    {
+                        return;
+                    }
+                    attributes.put(new BasicAttribute(name));
+                }
+                else
+                {
+                    Attribute attr = SimpleContainerHelper.storeArray(mmd, value, op.getExecutionContext().getTypeManager());
+                    attributes.put(attr);
+                }
+                return;
             }
             else if (mmd.hasMap())
             {

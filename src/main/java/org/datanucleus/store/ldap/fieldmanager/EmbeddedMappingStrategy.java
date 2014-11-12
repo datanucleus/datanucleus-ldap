@@ -209,32 +209,42 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     {
         if (embeddedAttrs != null && embeddedMmds != null)
         {
+            FetchFieldManager fetchFM = new FetchFieldManager(storeMgr, embeddedSM, embeddedAttrs);
             AbstractClassMetaData embeddedCmd = embeddedSM.getClassMetaData();
             String nullIndicatorColumn = embeddedMetaData.getNullIndicatorColumn();
             String nullIndicatorValue = embeddedMetaData.getNullIndicatorValue();
+
             // PK and owner first
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
             {
+                RelationType relType = embeddedMmd.getRelationType(clr);
                 String fieldName = embeddedMmd.getName();
-                int i = embeddedCmd.getAbsolutePositionOfMember(fieldName);
+                int embFieldNum = embeddedCmd.getAbsolutePositionOfMember(fieldName);
 
                 if (fieldName.equals(embeddedMetaData.getOwnerMember()))
                 {
-                    embeddedSM.replaceField(i, op.getObject());
+                    embeddedSM.replaceField(embFieldNum, op.getObject());
                 }
                 else if (embeddedMmd.isPrimaryKey())
                 {
-                    // TODO If no mapping strategy then use FetchFieldManager (embedded)
-                    AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
-                    embeddedSM.replaceField(i, ms.fetch());
+                    if (relType == RelationType.NONE)
+                    {
+                        embeddedSM.replaceFields(new int[]{embFieldNum}, fetchFM);
+                    }
+                    else
+                    {
+                        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
+                        embeddedSM.replaceField(embFieldNum, ms.fetch());
+                    }
                 }
             }
+
             // Then other fields
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
             {
                 String fieldName = embeddedMmd.getName();
                 String attributeName = LDAPUtils.getAttributeNameForField(embeddedMmd);
-                int i = embeddedCmd.getAbsolutePositionOfMember(fieldName);
+                int embFieldNum = embeddedCmd.getAbsolutePositionOfMember(fieldName);
 
                 if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
                 {
@@ -254,7 +264,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                         }
                     }
 
-                    embeddedSM.replaceField(i, embeddedValue);
+                    embeddedSM.replaceField(embFieldNum, embeddedValue);
                 }
             }
             return embeddedSM.getObject();

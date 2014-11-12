@@ -346,6 +346,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(op);
+        NucleusLogger.GENERAL.info(">> deleteObject for " + op);
 
         // Delete all reachable PC objects (due to dependent-field)
         op.loadUnloadedFields();
@@ -393,8 +394,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.DeleteRecursive.Start", op.getObjectAsPrintable(),
-                            op.getInternalObjectId()));
+                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.DeleteRecursive.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
                 }
 
                 LDAPUtils.deleteRecursive(LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true), ctx);

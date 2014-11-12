@@ -43,7 +43,6 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
 {
-
     public SimpleArrayMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);

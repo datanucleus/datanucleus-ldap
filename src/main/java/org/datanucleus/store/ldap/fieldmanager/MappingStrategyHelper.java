@@ -31,6 +31,7 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Helper for selecting and obtaining the mapping strategy for a member.
@@ -68,15 +69,17 @@ public class MappingStrategyHelper
             {
                 if (isArray)
                 {
+                    NucleusLogger.GENERAL.info(">> getMappingStrategy ARRAY " + mmd.getFullFieldName());
                     return new SimpleArrayMappingStrategy(op, mmd, attributes);
                 }
                 else if (isCollection)
                 {
+                    NucleusLogger.GENERAL.info(">> getMappingStrategy COLLECTION " + mmd.getFullFieldName());
                     return new SimpleCollectionMappingStrategy(op, mmd, attributes);
                 }
                 else
                 {
-                    // TODO Remove this. Only Embedded basic fields will come through here now
+                    // TODO Remove this. Only Embedded basic fields need to come through here now
                     return new SimpleMappingStrategy(op, mmd, attributes);
                 }
             }
@@ -87,15 +90,17 @@ public class MappingStrategyHelper
                 // TODO Use the converter in the mapping strategy since we took time to get it
                 if (isArray)
                 {
+                    NucleusLogger.GENERAL.info(">> getMappingStrategy ARRAY " + mmd.getFullFieldName());
                     return new SimpleArrayMappingStrategy(op, mmd, attributes);
                 }
                 else if (isCollection)
                 {
+                    NucleusLogger.GENERAL.info(">> getMappingStrategy COLLECTION " + mmd.getFullFieldName());
                     return new SimpleCollectionMappingStrategy(op, mmd, attributes);
                 }
                 else
                 {
-                    // TODO Remove this. Only Embedded basic fields will come through here now
+                    // TODO Remove this. Only Embedded basic fields need to come through here now
                     return new SimpleMappingStrategy(op, mmd, attributes);
                 }
             }
