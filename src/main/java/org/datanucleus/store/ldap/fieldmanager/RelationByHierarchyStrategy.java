@@ -59,10 +59,9 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
 
     protected boolean isFieldParentOfHierarchicalMapping;
 
-    protected RelationByHierarchyStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, 
-            Attributes attributes)
+    protected RelationByHierarchyStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
     {
-        super(sm, mmd, attributes);
+        super(op, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
         this.storeMgr = storeMgr;
         this.clr = ec.getClassLoaderResolver();

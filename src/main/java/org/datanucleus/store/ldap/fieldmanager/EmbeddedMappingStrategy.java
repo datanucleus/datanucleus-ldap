@@ -224,7 +224,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 }
                 else if (embeddedMmd.isPrimaryKey())
                 {
-                    AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
+                    AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
                     embeddedSM.replaceField(i, ms.fetch());
                 }
             }
@@ -237,7 +237,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
                 if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
                 {
-                    AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
+                    AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttrs);
                     Object embeddedValue = ms.fetch();
 
                     if (nullIndicatorColumn != null && attributeName.equals(nullIndicatorColumn))
@@ -394,7 +394,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             }
             else if (embeddedMmd.isPrimaryKey())
             {
-                AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 ms.insert(embeddedSM.provideField(i));
             }
         }
@@ -406,7 +406,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
             if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
             {
-                AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 ms.insert(embeddedSM.provideField(i));
             }
         }
@@ -641,7 +641,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             }
             else if (embeddedMmd.isPrimaryKey())
             {
-                AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 ms.update(embeddedSM.provideField(i));
             }
         }
@@ -655,7 +655,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
             {
                 int i = embeddedCmd.getAbsolutePositionOfMember(fieldName);
-                AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
                 Object embeddedValue = embeddedSM.provideField(i);
                 if (insert || LDAPUtils.isEmbeddedField(embeddedMmd) || dirtyFieldNameList.contains(fieldName))
                 {
@@ -695,7 +695,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
             {
-                AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, new BasicAttributes());
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, new BasicAttributes());
                 if (ms != null)
                 {
                     names.addAll(ms.getAttributeNames());

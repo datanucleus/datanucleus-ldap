@@ -59,6 +59,7 @@ import org.datanucleus.store.fieldmanager.DeleteFieldManager;
 import org.datanucleus.store.ldap.LDAPUtils.LocationInfo;
 import org.datanucleus.store.ldap.fieldmanager.AbstractMappingStrategy;
 import org.datanucleus.store.ldap.fieldmanager.FetchFieldManager;
+import org.datanucleus.store.ldap.fieldmanager.MappingStrategyHelper;
 import org.datanucleus.store.ldap.fieldmanager.StoreFieldManager;
 import org.datanucleus.store.ldap.fieldmanager.RelationByAttributeMetaData;
 import org.datanucleus.store.ldap.fieldmanager.RelationByDnMetaData;
@@ -722,7 +723,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         for (int i = 0; i < fieldNumbers.length; i++)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
-            AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, op, mmd, new BasicAttributes());
+            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, new BasicAttributes());
             List<String> attributeNames = ms.getAttributeNames();
             attributeNameList.addAll(attributeNames);
         }
@@ -732,15 +733,15 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         ManagedConnection mconn = storeMgr.getConnection(ec);
         try
         {
+            DirContext ctx = (DirContext) mconn.getConnection();
+
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Fetch.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
             }
 
-            DirContext ctx = (DirContext) mconn.getConnection();
             LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
-            
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.getAttributes", dn, attributeNameList, ""));

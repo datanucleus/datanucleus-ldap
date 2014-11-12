@@ -17,13 +17,26 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.store.ldap.fieldmanager;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
+import org.datanucleus.store.ldap.LDAPUtils;
+import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * FieldManager for retrieving field values from LDAP results.
@@ -43,15 +56,110 @@ public class FetchFieldManager extends AbstractFieldManager
         this.result = result;
     }
 
-    public String fetchStringField(int fieldNumber)
-    {
-        return (String) fetchObjectField(fieldNumber);
-    }
-
     public Object fetchObjectField(int fieldNumber)
     {
         AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, op, mmd, result);
+        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        Attribute attr = getAttributeForField(fieldNumber);
+
+        RelationType relType = mmd.getRelationType(clr);
+        if (relType == RelationType.NONE)
+        {
+            if (mmd.hasCollection())
+            {
+                // Handled by MappingStrategy currently
+            }
+            else if (mmd.hasArray())
+            {
+                // Handled by MappingStrategy currently
+            }
+            else if (mmd.hasMap())
+            {
+                // TODO Support maps!
+            }
+            else
+            {
+                // Handle all basic types here
+                if (attr == null)
+                {
+                    return null;
+                }
+
+                if (Boolean.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchBooleanField(attr);
+                }
+                else if (Byte.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchByteField(attr);
+                }
+                else if (Character.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchCharField(attr);
+                }
+                else if (Double.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchDoubleField(attr);
+                }
+                else if (Float.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchFloatField(attr);
+                }
+                else if (Integer.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchIntField(attr);
+                }
+                else if (Long.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchLongField(attr);
+                }
+                else if (Short.class.isAssignableFrom(mmd.getType()))
+                {
+                    return fetchShortField(attr);
+                }
+                else if (mmd.getType().isEnum())
+                {
+                    // Retrieve as either ordinal or String
+                    ColumnMetaData colmd = null;
+                    if (mmd != null && mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0)
+                    {
+                        colmd = mmd.getColumnMetaData()[0];
+                    }
+                    boolean useNumeric = MetaDataUtils.persistColumnAsNumeric(colmd);
+                    if (useNumeric)
+                    {
+                        return mmd.getType().getEnumConstants()[fetchIntField(attr)];
+                    }
+
+                    return Enum.valueOf(mmd.getType(), fetchStringField(attr));
+                }
+                else
+                {
+                    // Support for TypeConverter
+                    TypeConverter converter = null;
+                    if (Date.class.isAssignableFrom(mmd.getType()))
+                    {
+                        converter = new DateToGeneralizedTimeStringConverter();
+                    }
+                    else if (Calendar.class.isAssignableFrom(mmd.getType()))
+                    {
+                        converter = new CalendarToGeneralizedTimeStringConverter();
+                    }
+                    else
+                    {
+                        converter = op.getExecutionContext().getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
+                    }
+                    if (converter != null)
+                    {
+                        return converter.toMemberType(fetchStringField(attr));
+                    }
+
+                    throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
+                }
+            }
+        }
+
+        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, result);
         if (ms != null)
         {
             return ms.fetch();
@@ -61,43 +169,217 @@ public class FetchFieldManager extends AbstractFieldManager
         throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
     }
 
+    protected Attribute getAttributeForField(int fieldNumber)
+    {
+        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        String name = LDAPUtils.getAttributeNameForField(mmd);
+        return result.get(name);
+    }
+
     public boolean fetchBooleanField(int fieldNumber)
     {
-        return (Boolean) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchBooleanField(attr);
     }
 
     public byte fetchByteField(int fieldNumber)
     {
-        return (Byte) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchByteField(attr);
     }
 
     public char fetchCharField(int fieldNumber)
     {
-        return (Character) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchCharField(attr);
     }
 
     public double fetchDoubleField(int fieldNumber)
     {
-        return (Double) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchDoubleField(attr);
     }
 
     public float fetchFloatField(int fieldNumber)
     {
-        return (Float) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchFloatField(attr);
     }
 
     public int fetchIntField(int fieldNumber)
     {
-        return (Integer) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchIntField(attr);
     }
 
     public long fetchLongField(int fieldNumber)
     {
-        return (Long) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchLongField(attr);
     }
 
     public short fetchShortField(int fieldNumber)
     {
-        return (Short) fetchObjectField(fieldNumber);
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchShortField(attr);
+    }
+
+    public String fetchStringField(int fieldNumber)
+    {
+        Attribute attr = getAttributeForField(fieldNumber);
+        return fetchStringField(attr);
+    }
+
+    protected boolean fetchBooleanField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return false;
+        }
+        try
+        {
+            return Boolean.valueOf(attr.get(0).toString()).booleanValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected byte fetchByteField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return 0;
+        }
+        try
+        {
+            return Byte.valueOf(attr.get(0).toString()).byteValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected char fetchCharField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return ' ';
+        }
+        try
+        {
+            return attr.get(0).toString().charAt(0);
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected double fetchDoubleField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return 0;
+        }
+        try
+        {
+            return Double.valueOf(attr.get(0).toString()).doubleValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected float fetchFloatField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return 0;
+        }
+        try
+        {
+            return Float.valueOf(attr.get(0).toString()).floatValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected int fetchIntField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return 0;
+        }
+        try
+        {
+            return Integer.valueOf(attr.get(0).toString()).intValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected long fetchLongField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return 0;
+        }
+        try
+        {
+            return Long.valueOf(attr.get(0).toString()).longValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected short fetchShortField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return 0;
+        }
+        try
+        {
+            return Short.valueOf(attr.get(0).toString()).shortValue();
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+    }
+
+    protected String fetchStringField(Attribute attr)
+    {
+        if (attr == null)
+        {
+            return null;
+        }
+        try
+        {
+            if (attr.get(0) instanceof byte[])
+            {
+                // this is to support passwords!!!
+                return new String((byte[]) attr.get(0), "UTF-8");
+            }
+            return (String) attr.get(0);
+        }
+        catch (NamingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new NucleusDataStoreException(e.getMessage(), e);
+        }
     }
 }

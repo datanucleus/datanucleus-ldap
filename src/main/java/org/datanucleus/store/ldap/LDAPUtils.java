@@ -64,6 +64,7 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.ldap.fieldmanager.AbstractMappingStrategy;
 import org.datanucleus.store.ldap.fieldmanager.FetchFieldManager;
+import org.datanucleus.store.ldap.fieldmanager.MappingStrategyHelper;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -201,7 +202,7 @@ public class LDAPUtils
         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         Attributes rdnAttributes = new BasicAttributes();
 
-        AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, op, mmd, rdnAttributes);
+        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, rdnAttributes);
         ms.insert(value);
 
         return new Rdn(rdnAttributes);
@@ -642,7 +643,7 @@ public class LDAPUtils
 
             // get LDAP value
             Attributes pcAttributes = new BasicAttributes();
-            AbstractMappingStrategy ms = AbstractMappingStrategy.findMappingStrategy(storeMgr, op, pcMmd, pcAttributes);
+            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, pcMmd, pcAttributes);
             ms.insert(pcFieldValue);
             Attribute pcAttribute = pcAttributes.get(attributeName);
             return pcAttribute.get();
