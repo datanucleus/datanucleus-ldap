@@ -193,19 +193,22 @@ public class StoreFieldManager extends AbstractFieldManager
                 }
             }
         }
-
-        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, attributes);
-        if (ms != null)
+        else
         {
-            if (insert)
+            // Relationship field, so use mapping strategy where supported
+            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, attributes);
+            if (ms != null)
             {
-                ms.insert(value);
+                if (insert)
+                {
+                    ms.insert(value);
+                }
+                else
+                {
+                    ms.update(value);
+                }
+                return;
             }
-            else
-            {
-                ms.update(value);
-            }
-            return;
         }
 
         // TODO Localise this

@@ -48,6 +48,9 @@ import org.datanucleus.store.ldap.LDAPUtils;
 
 /**
  * Mapping strategy for embedded objects.
+ * NOTE THAT THE LOGIC IN THIS CLASS IS FLAWED. IT ASSUMES THAT "embeddedMetaData" IS PRESENT FOR NESTED CLASSES ALSO, YET IT ISN'T.
+ * This needs rewriting to use the same structure used by ALL other store plugins, namely have a StoreEmbeddedFieldManager/FetchEmbeddedFieldManager and
+ * from that you can manage nested embedded etc.
  */
 public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 {
@@ -97,7 +100,6 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
         // TODO Localise this
         throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
-
     }
 
     /**
@@ -162,7 +164,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         // search
         Collection<Object> coll = getCollectionInstance(collectionType);
         LdapName baseDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op);
-        
+
         // search exact type
         Map<LdapName, Attributes> entries = LDAPUtils.getEntries(storeMgr, ec, effectiveClassMetaData, baseDn, null, false, false);
         for (Attributes embeddedAttrs : entries.values())
@@ -275,10 +277,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     private Collection<Object> getCollectionInstance(Class<?> collectionType)
     {
-        Collection<Object> coll;
         try
         {
-            coll = (Collection<Object>) collectionType.newInstance();
+            return (Collection<Object>) collectionType.newInstance();
         }
         catch (InstantiationException e)
         {
@@ -288,7 +289,6 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         {
             throw new NucleusException("Error in trying to create object of type " + collectionType.getName(), e);
         }
-        return coll;
     }
 
     private ObjectProvider getEmbeddedObjectProvider(Object value)
@@ -394,34 +394,36 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         AbstractClassMetaData embeddedCmd = embeddedSM.getClassMetaData();
 
         // PK and owner first
+//        StoreFieldManager storeFM = new StoreFieldManager(storeMgr, embeddedSM, embeddedAttributes, true);
         for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
         {
             String fieldName = embeddedMmd.getName();
-            int i = embeddedCmd.getAbsolutePositionOfMember(fieldName);
+            int embFieldNum = embeddedCmd.getAbsolutePositionOfMember(fieldName);
 
             if (fieldName.equals(embeddedMetaData.getOwnerMember()))
             {
-                Object embeddedValue = op.getObject();
-                embeddedSM.replaceField(i, embeddedValue);
+                embeddedSM.replaceField(embFieldNum, op.getObject());
             }
             else if (embeddedMmd.isPrimaryKey())
             {
+//                embeddedSM.provideFields(new int[] {i}, storeFM);
                 // TODO If no mapping strategy then use StoreFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
-                ms.insert(embeddedSM.provideField(i));
+                ms.insert(embeddedSM.provideField(embFieldNum));
             }
         }
 
         for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
         {
             String fieldName = embeddedMmd.getName();
-            int i = embeddedCmd.getAbsolutePositionOfMember(fieldName);
+            int embFieldNum = embeddedCmd.getAbsolutePositionOfMember(fieldName);
 
             if (!fieldName.equals(embeddedMetaData.getOwnerMember()) && !embeddedMmd.isPrimaryKey())
             {
+//                embeddedSM.provideFields(new int[] {i}, storeFM);
                 // TODO If no mapping strategy then use StoreFieldManager (embedded)
                 AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, embeddedSM, embeddedMmd, embeddedAttributes);
-                ms.insert(embeddedSM.provideField(i));
+                ms.insert(embeddedSM.provideField(embFieldNum));
             }
         }
     }
@@ -429,7 +431,6 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     @Override
     public void update(Object value)
     {
-        // System.out.println("Update field " + mmd.getName() + " of " + sm.getObject());
         RelationType relType = mmd.getRelationType(clr);
         if (relType == RelationType.ONE_TO_ONE_UNI || relType == RelationType.ONE_TO_ONE_BI)
         {
@@ -589,15 +590,13 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             return;
         }
 
-        // merge fields into the BasicAttributes data structure,
-        // this also updates nested embedded objects recursively
+        // merge fields into the BasicAttributes data structure, this also updates nested embedded objects recursively
         BasicAttributes embeddedAttributes = new BasicAttributes();
         updateMerge(embeddedSM, embeddedAttributes, dirtyAndEmbeddedMmds, embeddedMetaData, insert);
 
         // schedule update of fields
         if (embeddedAttributes.size() > 0)
         {
-            // get DN
             LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, embeddedSM);
             LDAPUtils.update(storeMgr, dn, embeddedAttributes, ec);
         }
