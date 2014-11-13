@@ -51,6 +51,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.AbstractPersistenceHandler;
 import org.datanucleus.store.StoreManager;
@@ -718,20 +719,24 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         }
 
         List<String> attributeNameList = new ArrayList<String>();
+        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
         for (int i = 0; i < fieldNumbers.length; i++)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
-            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, new BasicAttributes());
-            if (ms == null)
+            RelationType relType = mmd.getRelationType(clr);
+            if (relType == RelationType.NONE)
             {
-                // Basic type
-                String name = LDAPUtils.getAttributeNameForField(mmd);
-                attributeNameList.add(name);
+                String attrName = LDAPUtils.getAttributeNameForField(mmd);
+                attributeNameList.add(attrName);
             }
             else
             {
-                List<String> attributeNames = ms.getAttributeNames();
-                attributeNameList.addAll(attributeNames);
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, new BasicAttributes());
+                if (ms != null)
+                {
+                    List<String> attributeNames = ms.getAttributeNames();
+                    attributeNameList.addAll(attributeNames);
+                }
             }
         }
         String[] attributeNames = attributeNameList.toArray(new String[0]);
