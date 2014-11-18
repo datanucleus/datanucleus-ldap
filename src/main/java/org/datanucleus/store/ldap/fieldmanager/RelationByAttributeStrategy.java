@@ -253,6 +253,12 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         LDAPUtils.markForPersisting(value, ec);
                         LDAPUtils.unmarkForDeletion(value, ec);
                         removeAttributeReference(oldValue, ownerAttributeName, joinAttributeValue, emptyValue);
+                        ObjectProvider valueOP = ec.findObjectProvider(value);
+                        if (valueOP != null && valueOP.isWaitingToBeFlushedToDatastore())
+                        {
+                            // New value is not yet persistent, so flush it so we can set its attribute
+                            valueOP.flush();
+                        }
                         addAttributeReference(value, ownerAttributeName, joinAttributeValue, emptyValue);
                     }
                 }
