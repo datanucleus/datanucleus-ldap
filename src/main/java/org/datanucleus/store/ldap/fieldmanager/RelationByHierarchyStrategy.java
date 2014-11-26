@@ -86,7 +86,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                 if (mmd.hasCollection())
                 {
                     Collection<Object> coll = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, op);
-                    return op.wrapSCOField(fieldNumber, coll, false, false, true);
+                    return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
                 }
             }
         }

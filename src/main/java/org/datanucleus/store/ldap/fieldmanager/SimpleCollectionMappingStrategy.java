@@ -145,7 +145,7 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
 
             int fieldNumber = op.isEmbedded() ? op.getClassMetaData().getAbsolutePositionOfMember(mmd.getName()) : mmd.getAbsoluteFieldNumber();
             op.setAssociatedValue("COLL" + fieldNumber, collection);
-            return op.wrapSCOField(fieldNumber, collection, false, false, true);
+            return SCOUtils.wrapSCOField(op, fieldNumber, collection, false, false, true);
         }
 
         // TODO Localise this

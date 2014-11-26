@@ -45,6 +45,7 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
+import org.datanucleus.store.types.SCOUtils;
 
 /**
  * Mapping strategy for embedded objects.
@@ -94,7 +95,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 Class instanceType = mmd.getType();
                 instanceType = org.datanucleus.store.types.SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                 Collection<Object> coll = fetchFromChildren(instanceType);
-                return op.wrapSCOField(fieldNumber, coll, false, false, true);
+                return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
             }
         }
 

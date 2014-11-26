@@ -38,6 +38,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.ldap.LDAPUtils;
+import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
@@ -72,7 +73,7 @@ public class FetchFieldManager extends AbstractFieldManager
             if (mmd.hasCollection())
             {
                 Collection coll = SimpleContainerHelper.fetchCollection(mmd, attr, ec.getTypeManager(), clr);
-                return op.wrapSCOField(fieldNumber, coll, false, false, true);
+                return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
             }
             else if (mmd.hasArray())
             {
