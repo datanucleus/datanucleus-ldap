@@ -95,7 +95,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 if (mmd.hasCollection())
                 {
                     Collection<Object> coll = getDnMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, op);
-                    return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
+                    return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
                 }
             }
 
@@ -141,7 +141,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 {
                     throw new NucleusException("Error in trying to create object of type " + instanceType.getName(), e);
                 }
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
+                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
             }
         }
 

@@ -95,7 +95,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 Class instanceType = mmd.getType();
                 instanceType = org.datanucleus.store.types.SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                 Collection<Object> coll = fetchFromChildren(instanceType);
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
+                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
             }
         }
 

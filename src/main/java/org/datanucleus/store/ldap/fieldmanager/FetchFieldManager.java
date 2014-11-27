@@ -73,7 +73,7 @@ public class FetchFieldManager extends AbstractFieldManager
             if (mmd.hasCollection())
             {
                 Collection coll = SimpleContainerHelper.fetchCollection(mmd, attr, ec.getTypeManager(), clr);
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, false, false, true);
+                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
             }
             else if (mmd.hasArray())
             {
