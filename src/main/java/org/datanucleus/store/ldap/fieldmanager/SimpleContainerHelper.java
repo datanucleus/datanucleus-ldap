@@ -653,6 +653,7 @@ public class SimpleContainerHelper
      * @param mmd Metadata for the member (field/property).
      * @param value The value to store
      * @param typeMgr TypeManager
+     * @param clr ClassLoader resolver
      * @return The Attribute to store in LDAP
      */
     public static Attribute storeCollection(AbstractMemberMetaData mmd, Object value, TypeManager typeMgr, ClassLoaderResolver clr)
@@ -1076,10 +1077,6 @@ public class SimpleContainerHelper
         return storeObjectArrayField(values, false, mmd);
     }
 
-    /**
-     * Stores the string representation of each array element as multi-valued attribute.
-     * @param values the values
-     */
     protected static Attribute storeObjectArrayField(Object[] values, boolean singleAttribute, AbstractMemberMetaData mmd)
     {
         List<String> strings = new ArrayList<String>();
@@ -1090,10 +1087,6 @@ public class SimpleContainerHelper
         return storeStringList(strings, mmd);
     }
 
-    /**
-     * Stores the each list element as multi-valued attribute.
-     * @param values the values
-     */
     protected static Attribute storeStringList(List<String> values, AbstractMemberMetaData mmd)
     {
         String name = LDAPUtils.getAttributeNameForField(mmd);
