@@ -286,7 +286,7 @@ public class SimpleContainerHelper
         boolean[] values = new boolean[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Boolean(stringValues[i]).booleanValue();
+            values[i] = Boolean.valueOf(stringValues[i]).booleanValue();
         }
         return values;
     }
@@ -303,7 +303,7 @@ public class SimpleContainerHelper
         Boolean[] values = new Boolean[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Boolean(stringValues[i]);
+            values[i] = Boolean.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -320,7 +320,7 @@ public class SimpleContainerHelper
         Byte[] values = new Byte[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Byte(stringValues[i]);
+            values[i] = Byte.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -354,7 +354,7 @@ public class SimpleContainerHelper
         Character[] values = new Character[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Character(stringValues[i].charAt(0));
+            values[i] = Character.valueOf(stringValues[i].charAt(0));
         }
         return values;
     }
@@ -371,7 +371,7 @@ public class SimpleContainerHelper
         double[] values = new double[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Double(stringValues[i]).doubleValue();
+            values[i] = Double.valueOf(stringValues[i]).doubleValue();
         }
         return values;
     }
@@ -388,7 +388,7 @@ public class SimpleContainerHelper
         Double[] values = new Double[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Double(stringValues[i]);
+            values[i] = Double.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -405,7 +405,7 @@ public class SimpleContainerHelper
         float[] values = new float[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Float(stringValues[i]).floatValue();
+            values[i] = Float.valueOf(stringValues[i]).floatValue();
         }
         return values;
     }
@@ -422,7 +422,7 @@ public class SimpleContainerHelper
         Float[] values = new Float[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Float(stringValues[i]);
+            values[i] = Float.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -439,7 +439,7 @@ public class SimpleContainerHelper
         int[] values = new int[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Integer(stringValues[i]).intValue();
+            values[i] = Integer.valueOf(stringValues[i]).intValue();
         }
         return values;
     }
@@ -456,7 +456,7 @@ public class SimpleContainerHelper
         Integer[] values = new Integer[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Integer(stringValues[i]);
+            values[i] = Integer.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -576,7 +576,7 @@ public class SimpleContainerHelper
         byte[] values = new byte[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Byte(stringValues[i]).byteValue();
+            values[i] = Byte.valueOf(stringValues[i]).byteValue();
         }
         return values;
     }

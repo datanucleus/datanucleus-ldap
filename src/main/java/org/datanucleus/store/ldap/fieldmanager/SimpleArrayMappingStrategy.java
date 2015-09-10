@@ -227,7 +227,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         byte[] values = new byte[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Byte(stringValues[i]).byteValue();
+            values[i] = Byte.valueOf(stringValues[i]).byteValue();
         }
         return values;
     }
@@ -244,7 +244,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         Byte[] values = new Byte[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Byte(stringValues[i]);
+            values[i] = Byte.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -278,7 +278,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         Character[] values = new Character[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Character(stringValues[i].charAt(0));
+            values[i] = Character.valueOf(stringValues[i].charAt(0));
         }
         return values;
     }
@@ -295,7 +295,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         double[] values = new double[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Double(stringValues[i]).doubleValue();
+            values[i] = Double.valueOf(stringValues[i]).doubleValue();
         }
         return values;
     }
@@ -312,7 +312,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         Double[] values = new Double[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Double(stringValues[i]);
+            values[i] = Double.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -329,7 +329,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         float[] values = new float[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Float(stringValues[i]).floatValue();
+            values[i] = Float.valueOf(stringValues[i]).floatValue();
         }
         return values;
     }
@@ -346,7 +346,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         Float[] values = new Float[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Float(stringValues[i]);
+            values[i] = Float.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -363,7 +363,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         int[] values = new int[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Integer(stringValues[i]).intValue();
+            values[i] = Integer.valueOf(stringValues[i]).intValue();
         }
         return values;
     }
@@ -380,7 +380,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         Integer[] values = new Integer[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Integer(stringValues[i]);
+            values[i] = Integer.valueOf(stringValues[i]);
         }
         return values;
     }
