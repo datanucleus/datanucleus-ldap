@@ -197,7 +197,7 @@ public class SimpleMappingStrategy extends AbstractMappingStrategy
         }
         try
         {
-            return new Boolean(attr.get(0).toString()).booleanValue();
+            return Boolean.valueOf(attr.get(0).toString()).booleanValue();
         }
         catch (NamingException e)
         {
@@ -213,7 +213,7 @@ public class SimpleMappingStrategy extends AbstractMappingStrategy
         }
         try
         {
-            return new Byte(attr.get(0).toString()).byteValue();
+            return Byte.valueOf(attr.get(0).toString()).byteValue();
         }
         catch (NamingException e)
         {
@@ -245,7 +245,7 @@ public class SimpleMappingStrategy extends AbstractMappingStrategy
         }
         try
         {
-            return new Double(attr.get(0).toString()).doubleValue();
+            return Double.valueOf(attr.get(0).toString()).doubleValue();
         }
         catch (NamingException e)
         {
@@ -261,7 +261,7 @@ public class SimpleMappingStrategy extends AbstractMappingStrategy
         }
         try
         {
-            return new Float(attr.get(0).toString()).floatValue();
+            return Float.valueOf(attr.get(0).toString()).floatValue();
         }
         catch (NamingException e)
         {
@@ -277,7 +277,7 @@ public class SimpleMappingStrategy extends AbstractMappingStrategy
         }
         try
         {
-            return new Integer(attr.get(0).toString()).intValue();
+            return Integer.valueOf(attr.get(0).toString()).intValue();
         }
         catch (NamingException e)
         {
