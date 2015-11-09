@@ -13,7 +13,7 @@ KeyFacts
 __License__ : Apache 2 licensed  
 __Issue Tracker__ : http://www.datanucleus.org/servlet/jira/browse/NUCLDAP  
 __RoadMap__ : http://issues.datanucleus.org/browse/NUCLDAP?report=com.atlassian.jira.plugin.system.project:roadmap-panel  
-__Javadocs__ : [4.1](http://www.datanucleus.org/javadocs/store.ldap/4.1/), [4.0](http://www.datanucleus.org/javadocs/store.ldap/4.0/), [3.2](http://www.datanucleus.org/javadocs/store.ldap/3.2/), [3.1](http://www.datanucleus.org/javadocs/store.ldap/3.1/), [3.0](http://www.datanucleus.org/javadocs/store.ldap/3.0/), [2.1](http://www.datanucleus.org/javadocs/store.ldap/2.1/), [2.0](http://www.datanucleus.org/javadocs/store.ldap/2.0/), [1.1](http://www.datanucleus.org/javadocs/store.ldap/1.1/), [1.0](http://www.datanucleus.org/javadocs/store.ldap/1.0/)  
+__Javadocs__ : [5.0](http://www.datanucleus.org/javadocs/store.ldap/5.0/), [4.1](http://www.datanucleus.org/javadocs/store.ldap/4.1/), [4.0](http://www.datanucleus.org/javadocs/store.ldap/4.0/), [3.2](http://www.datanucleus.org/javadocs/store.ldap/3.2/), [3.1](http://www.datanucleus.org/javadocs/store.ldap/3.1/), [3.0](http://www.datanucleus.org/javadocs/store.ldap/3.0/), [2.1](http://www.datanucleus.org/javadocs/store.ldap/2.1/), [2.0](http://www.datanucleus.org/javadocs/store.ldap/2.0/), [1.1](http://www.datanucleus.org/javadocs/store.ldap/1.1/), [1.0](http://www.datanucleus.org/javadocs/store.ldap/1.0/)  
 __Download(Releases)__ : [Maven Central](http://central.maven.org/maven2/org/datanucleus/datanucleus-ldap)  
 __Download(Nightly)__ : [Nightly Builds](http://www.datanucleus.org/downloads/maven2-nightly/org/datanucleus/datanucleus-ldap)  
 __Dependencies__ : See file [pom.xml](pom.xml)  
