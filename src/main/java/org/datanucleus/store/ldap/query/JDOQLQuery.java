@@ -23,8 +23,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.query.evaluator.JDOQLEvaluator;
-import org.datanucleus.query.evaluator.JavaQueryEvaluator;
+import org.datanucleus.query.inmemory.JDOQLInMemoryEvaluator;
+import org.datanucleus.query.inmemory.JavaQueryInMemoryEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.query.AbstractJDOQLQuery;
@@ -103,7 +103,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         }
 
         // Map any result restrictions onto the LDAP search results
-        JavaQueryEvaluator resultMapper = new JDOQLEvaluator(this, candidates, compilation, parameters, 
+        JavaQueryInMemoryEvaluator resultMapper = new JDOQLInMemoryEvaluator(this, candidates, compilation, parameters, 
             ec.getClassLoaderResolver());
         Collection results = resultMapper.execute(true, true, true, true, true);
 

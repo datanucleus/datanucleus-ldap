@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.query.evaluator.JPQLEvaluator;
-import org.datanucleus.query.evaluator.JavaQueryEvaluator;
+import org.datanucleus.query.inmemory.JPQLInMemoryEvaluator;
+import org.datanucleus.query.inmemory.JavaQueryInMemoryEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.query.AbstractJPQLQuery;
@@ -95,7 +95,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         }
 
         // Map any result restrictions onto the LDAP search results
-        JavaQueryEvaluator resultMapper = new JPQLEvaluator(this, candidates, compilation, parameters, ec.getClassLoaderResolver());
+        JavaQueryInMemoryEvaluator resultMapper = new JPQLInMemoryEvaluator(this, candidates, compilation, parameters, ec.getClassLoaderResolver());
         Collection results = resultMapper.execute(true, true, true, true, true);
 
         if (NucleusLogger.QUERY.isDebugEnabled())
