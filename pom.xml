@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>datanucleus-ldap</artifactId>
-	<version>5.0.0-release-SNAPSHOT</version>
+	<version>5.0.0-release</version>
 
     <name>DataNucleus LDAP plugin</name>
     <description>
