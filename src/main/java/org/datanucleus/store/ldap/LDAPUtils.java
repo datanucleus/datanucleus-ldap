@@ -103,7 +103,7 @@ public class LDAPUtils
         }
 
         AbstractClassMetaData collectionFieldTypeCmd =
-            (mmd.getCollection() != null) ? mmd.getCollection().getElementClassMetaData(clr, mmgr) : null;
+            (mmd.getCollection() != null) ? mmd.getCollection().getElementClassMetaData(clr) : null;
         if (collectionFieldTypeCmd != null)
         {
             return collectionFieldTypeCmd;
@@ -1005,8 +1005,7 @@ public class LDAPUtils
                     for (AbstractMemberMetaData mmd : allMemberMetaData)
                     {
                         mmd.getAbsoluteFieldNumber();
-                        if (mmd.getRelationType(clr) == RelationType.NONE &&
-                            !mmd.isPersistentInterface(clr, ec.getMetaDataManager()) && 
+                        if (mmd.getRelationType(clr) == RelationType.NONE && !mmd.isPersistentInterface(clr) && 
                             !Collection.class.isAssignableFrom(mmd.getType()) && !Map.class.isAssignableFrom(mmd.getType()) && !mmd.getType().isArray())
                         {
                             basicMemberMetaData.add(mmd);
