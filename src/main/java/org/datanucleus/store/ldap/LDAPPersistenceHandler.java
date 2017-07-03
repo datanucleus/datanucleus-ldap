@@ -135,7 +135,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
         // insert
         ExecutionContext ec = op.getExecutionContext();
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             long startTime = System.currentTimeMillis();
@@ -244,7 +244,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
         // TODO Implement version checking
         ExecutionContext ec = op.getExecutionContext();
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             long startTime = System.currentTimeMillis();
@@ -360,7 +360,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         // delete
         // TODO Implement version checking
         ExecutionContext ec = op.getExecutionContext();
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         DirContext ctx = (DirContext) mconn.getConnection();
         long startTime = System.currentTimeMillis();
         try
@@ -501,7 +501,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
         // search for object with (pcAttributeName=myDN)
         ExecutionContext om = op.getExecutionContext();
-        ManagedConnection mconn = storeMgr.getConnection(om);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(om);
         try
         {
             LdapName base = LDAPUtils.getSearchBase(cmd, op.getExecutionContext().getMetaDataManager());
@@ -636,7 +636,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     {
         // search for object with (pcAttributeName=myDN)
         ExecutionContext om = op.getExecutionContext();
-        ManagedConnection mconn = storeMgr.getConnection(om);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(om);
         try
         {
             LdapName base = LDAPUtils.getSearchBase(cmd, op.getExecutionContext().getMetaDataManager());
@@ -742,7 +742,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         String[] attributeNames = attributeNameList.toArray(new String[0]);
 
         ExecutionContext ec = op.getExecutionContext();
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -809,7 +809,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 long startTime = System.currentTimeMillis();

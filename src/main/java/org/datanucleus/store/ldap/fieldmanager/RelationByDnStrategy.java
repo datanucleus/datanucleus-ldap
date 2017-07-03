@@ -440,7 +440,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             ObjectProvider oldPcSM = ec.findObjectProvider(oldObject, true);
             LdapName oldPcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, oldPcSM);
 
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();
@@ -486,7 +486,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 return;
             }
 
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();

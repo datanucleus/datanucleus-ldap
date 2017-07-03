@@ -469,7 +469,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 return;
             }
 
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();
@@ -515,7 +515,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 return;
             }
 
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 DirContext ctx = (DirContext) mconn.getConnection();

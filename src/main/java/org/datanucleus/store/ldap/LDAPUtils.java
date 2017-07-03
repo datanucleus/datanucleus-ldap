@@ -279,7 +279,7 @@ public class LDAPUtils
                     String ocFilter = getSearchFilter(cmd);
                     String rdnFilter = "(" + rdn.getType() + "=" + rdn.getValue() + ")";
                     String filter = ocFilter != null ? "(&" + ocFilter + rdnFilter + ")" : rdnFilter;
-                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                     try
                     {
                         DirContext ctx = (DirContext) mconn.getConnection();
@@ -664,7 +664,7 @@ public class LDAPUtils
      */
     public static Collection<Object> getAttributeValuesFromLDAP(StoreManager storeMgr, ObjectProvider op, String attributeName)
     {
-        ManagedConnection mconn = storeMgr.getConnection(op.getExecutionContext());
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
         try
         {
             LdapName dn = getDistinguishedNameForObject(storeMgr, op, true);
@@ -833,7 +833,7 @@ public class LDAPUtils
 
     public static void markForRename(StoreManager storeMgr, Object pc, ExecutionContext ec, LdapName oldDn, LdapName newDn)
     {
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
@@ -1125,7 +1125,7 @@ public class LDAPUtils
     public static Map<LdapName, Attributes> getEntries(StoreManager storeMgr, ExecutionContext ec,
         final AbstractClassMetaData candidateCmd, LdapName base, String additionalFilter, boolean subclasses, boolean ignoreCache)
     {
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -1220,7 +1220,7 @@ public class LDAPUtils
         {
             NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.createSubcontext", dn, attributes));
         }
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             ((DirContext) mconn.getConnection()).bind(dn, null, attributes);
@@ -1241,7 +1241,7 @@ public class LDAPUtils
         {
             NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.modifyAttributes", dn, "REPLACE", attributes));
         }
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             ((DirContext) mconn.getConnection()).modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
@@ -1258,7 +1258,7 @@ public class LDAPUtils
 
     public static void deleteRecursive(StoreManager storeMgr, LdapName dn, ExecutionContext ec)
     {
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             deleteRecursive(dn, (DirContext) mconn.getConnection());
