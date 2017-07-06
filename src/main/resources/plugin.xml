@@ -23,15 +23,8 @@ Contributors:
         <store-manager class-name="org.datanucleus.store.ldap.LDAPStoreManager" key="ldap" url-key="ldap"/>
     </extension>
 
-    <!-- QUERY LANGUAGES -->
-    <extension point="org.datanucleus.store_query_query">
-        <query class-name="org.datanucleus.store.ldap.query.JDOQLQuery" datastore="ldap" name="JDOQL"/>
-        <query class-name="org.datanucleus.store.ldap.query.JPQLQuery" datastore="ldap" name="JPQL"/>
-    </extension>
-
     <!-- CONNECTION FACTORY -->
     <extension point="org.datanucleus.store_connectionfactory">
-        <connectionfactory name="ldap" class-name="org.datanucleus.store.ldap.ConnectionFactoryImpl" transactional="true"
-            datastore="ldap"/>
+        <connectionfactory name="ldap" class-name="org.datanucleus.store.ldap.ConnectionFactoryImpl" transactional="true" datastore="ldap"/>
     </extension>
 </plugin>
