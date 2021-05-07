@@ -137,7 +137,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
 
         try
         {
-            coll = (Collection<Object>) collectionClass.newInstance();
+            coll = (Collection<Object>) collectionClass.getDeclaredConstructor().newInstance();
 
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
             MetaDataManager metaDataMgr = sm.getExecutionContext().getMetaDataManager();
@@ -147,11 +147,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
             List<Object> objects = LDAPUtils.getObjectsOfCandidateType(storeMgr, ec, childCmd, base, null, true, false);
             coll.addAll(objects);
         }
-        catch (InstantiationException e)
-        {
-            throw new NucleusException("Error in trying to create object of type " + collectionClass.getName(), e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
             throw new NucleusException("Error in trying to create object of type " + collectionClass.getName(), e);
         }

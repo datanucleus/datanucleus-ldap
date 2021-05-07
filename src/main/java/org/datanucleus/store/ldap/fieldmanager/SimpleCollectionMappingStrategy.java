@@ -19,6 +19,7 @@ Contributors :
 package org.datanucleus.store.ldap.fieldmanager;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -56,13 +57,9 @@ public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
         instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
         try
         {
-            collection = (Collection<Object>) instanceType.newInstance();
+            collection = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
         }
-        catch (InstantiationException e)
-        {
-            throw new NucleusDataStoreException(e.getMessage(), e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
             throw new NucleusDataStoreException(e.getMessage(), e);
         }

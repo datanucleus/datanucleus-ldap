@@ -17,6 +17,7 @@ Contributors :
  ***********************************************************************/
 package org.datanucleus.store.ldap.fieldmanager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -127,7 +128,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                 try
                 {
-                    coll = (Collection<Object>) instanceType.newInstance();
+                    coll = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
                     Class elementType = clr.classForName(mmd.getCollection().getElementType());
                     removeEmptyValue(emptyValue, attr);
                     for (int i = 0; attr != null && i < attr.size(); i++)
@@ -346,7 +347,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                             instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                             try
                             {
-                                oldColl = (Collection<Object>) instanceType.newInstance();
+                                oldColl = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
                                 Class elementType = clr.classForName(mmd.getCollection().getElementType());
                                 for (Object object : attributeValues)
                                 {
@@ -435,7 +436,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
 
         try
         {
-            coll = (Collection<Object>) collectionClass.newInstance();
+            coll = (Collection<Object>) collectionClass.getDeclaredConstructor().newInstance();
 
             String attributeFilter = "(" + pcAttributeName + "=" + myAttributeValue + ")";
             LdapName base = LDAPUtils.getSearchBase(cmd, ec.getMetaDataManager());
@@ -443,11 +444,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
 
             coll.addAll(objects);
         }
-        catch (InstantiationException e)
-        {
-            throw new NucleusException("Error in trying to create object of type " + collectionClass.getName(), e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
             throw new NucleusException("Error in trying to create object of type " + collectionClass.getName(), e);
         }

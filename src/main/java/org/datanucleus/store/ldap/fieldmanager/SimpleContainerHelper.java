@@ -19,6 +19,7 @@ package org.datanucleus.store.ldap.fieldmanager;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -134,13 +135,9 @@ public class SimpleContainerHelper
             instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
             try
             {
-                collection = (Collection<Object>) instanceType.newInstance();
+                collection = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
             }
-            catch (InstantiationException e)
-            {
-                throw new NucleusDataStoreException(e.getMessage(), e);
-            }
-            catch (IllegalAccessException e)
+            catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
             {
                 throw new NucleusDataStoreException(e.getMessage(), e);
             }
@@ -612,7 +609,7 @@ public class SimpleContainerHelper
                         try
                         {
                             String number = value.substring(left + 1, right);
-                            Integer integer = new Integer(number);
+                            Integer integer = Integer.valueOf(number);
                             value = value.substring(right + 1);
                             if (!orderingMap.containsKey(integer))
                             {

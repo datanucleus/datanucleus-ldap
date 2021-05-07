@@ -171,7 +171,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         boolean[] values = new boolean[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Boolean(stringValues[i]).booleanValue();
+            values[i] = Boolean.valueOf(stringValues[i]).booleanValue();
         }
         return values;
     }
@@ -188,7 +188,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         Boolean[] values = new Boolean[stringValues.length];
         for (int i = 0; i < stringValues.length; i++)
         {
-            values[i] = new Boolean(stringValues[i]);
+            values[i] = Boolean.valueOf(stringValues[i]);
         }
         return values;
     }
@@ -495,7 +495,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
                         try
                         {
                             String number = value.substring(left + 1, right);
-                            Integer integer = new Integer(number);
+                            Integer integer = Integer.valueOf(number);
                             value = value.substring(right + 1);
                             if (!orderingMap.containsKey(integer))
                             {

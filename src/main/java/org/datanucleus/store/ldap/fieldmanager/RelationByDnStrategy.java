@@ -18,6 +18,7 @@ Contributors :
  ***********************************************************************/
 package org.datanucleus.store.ldap.fieldmanager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -125,7 +126,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                 try
                 {
-                    coll = (Collection<Object>) instanceType.newInstance();
+                    coll = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
                     Class elementType = clr.classForName(mmd.getCollection().getElementType());
                     removeEmptyValue(emptyValue, attr);
                     for (int i = 0; attr != null && i < attr.size(); i++)
@@ -331,7 +332,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                             Collection<Object> attributeValues = LDAPUtils.getAttributeValuesFromLDAP(storeMgr, op, ownerAttributeName);
                             try
                             {
-                                oldColl = (Collection<Object>) instanceType.newInstance();
+                                oldColl = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
                                 Class elementType = clr.classForName(mmd.getCollection().getElementType());
                                 for (Object object : attributeValues)
                                 {
@@ -410,7 +411,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         }
         try
         {
-            coll = (Collection<Object>) collectionClass.newInstance();
+            coll = (Collection<Object>) collectionClass.getDeclaredConstructor().newInstance();
 
             ExecutionContext om = sm.getExecutionContext();
             LdapName myDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm);
@@ -420,11 +421,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
 
             coll.addAll(objects);
         }
-        catch (InstantiationException e)
-        {
-            throw new NucleusException("Error in trying to create object of type " + collectionClass.getName(), e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
             throw new NucleusException("Error in trying to create object of type " + collectionClass.getName(), e);
         }

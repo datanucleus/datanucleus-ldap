@@ -18,6 +18,7 @@ Contributors :
  ***********************************************************************/
 package org.datanucleus.store.ldap.fieldmanager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -280,13 +281,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     {
         try
         {
-            return (Collection<Object>) collectionType.newInstance();
+            return (Collection<Object>) collectionType.getDeclaredConstructor().newInstance();
         }
-        catch (InstantiationException e)
-        {
-            throw new NucleusException("Error in trying to create object of type " + collectionType.getName(), e);
-        }
-        catch (IllegalAccessException e)
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
             throw new NucleusException("Error in trying to create object of type " + collectionType.getName(), e);
         }
