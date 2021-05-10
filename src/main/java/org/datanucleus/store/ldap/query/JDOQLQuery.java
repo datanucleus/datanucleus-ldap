@@ -23,12 +23,12 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.query.inmemory.JDOQLInMemoryEvaluator;
-import org.datanucleus.query.inmemory.JavaQueryInMemoryEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.query.AbstractJDOQLQuery;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.store.query.inmemory.JDOQLInMemoryEvaluator;
+import org.datanucleus.store.query.inmemory.JavaQueryInMemoryEvaluator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
