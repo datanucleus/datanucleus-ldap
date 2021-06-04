@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.TransactionEventListener;
+import org.datanucleus.transaction.TransactionEventListener;
 
 /**
  * Transaction Event Listener for the LDAP store.
