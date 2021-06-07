@@ -39,8 +39,8 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Methods to assist in the conversion between a container(collection/array) field (of non-persistable object) and an Attribute, and vice-versa.
@@ -275,8 +275,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getBooleanArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBooleanArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -292,8 +291,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBooleanObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -309,8 +307,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getByteObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getByteObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -326,8 +323,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getCharArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getCharArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -343,8 +339,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getCharObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getCharObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -360,8 +355,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getDoubleArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getDoubleArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -377,8 +371,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getDoubleObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -394,8 +387,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getFloatArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getFloatArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -411,8 +403,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getFloatObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getFloatObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -428,8 +419,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getIntArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getIntArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -445,8 +435,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getIntObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getIntObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -462,8 +451,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getLongArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getLongArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -479,8 +467,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getLongObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getLongObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -496,8 +483,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getShortArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getShortArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -513,8 +499,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = fetchByteArrayField(attr, true, mmd);
-            return TypeConversionHelper.getShortObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getShortObjectArrayFromByteArray(fetchByteArrayField(attr, true, mmd));
         }
 
         String[] stringValues = fetchStringArrayField(attr, false, mmd);
@@ -855,8 +840,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromBooleanArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -872,8 +856,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromBooleanObjectArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -905,8 +888,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromByteObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromByteObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);
@@ -916,8 +898,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromCharArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromCharArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -932,8 +913,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromCharObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromCharObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);
@@ -943,8 +923,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromDoubleArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromDoubleArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -959,8 +938,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromDoubleObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromDoubleObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);
@@ -970,8 +948,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromFloatArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromFloatArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -986,8 +963,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromFloatObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromFloatObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);
@@ -997,8 +973,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromIntArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromIntArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -1013,8 +988,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromIntObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromIntObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);
@@ -1024,8 +998,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromLongArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromLongArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -1040,8 +1013,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromLongObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromLongObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);
@@ -1051,8 +1023,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromShortArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromShortArray(values), true, mmd);
         }
 
         List<String> strings = new ArrayList<String>();
@@ -1067,8 +1038,7 @@ public class SimpleContainerHelper
     {
         if (singleAttribute)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromShortObjectArray(values);
-            return storeByteArrayField(bytes, true, mmd);
+            return storeByteArrayField(ArrayConversionHelper.getByteArrayFromShortObjectArray(values), true, mmd);
         }
 
         return storeObjectArrayField(values, false, mmd);

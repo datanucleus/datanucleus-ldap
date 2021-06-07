@@ -34,8 +34,8 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping strategy for arrays of simple types like primitives, Strings, wrappers of primitives, and objects with an
@@ -163,8 +163,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getBooleanArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBooleanArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -180,8 +179,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBooleanObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -236,8 +234,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getByteObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getByteObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -253,8 +250,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getCharArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getCharArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -270,8 +266,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getCharObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getCharObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -287,8 +282,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getDoubleArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getDoubleArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -304,8 +298,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getDoubleObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -321,8 +314,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getFloatArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getFloatArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -338,8 +330,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getFloatObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getFloatObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -355,8 +346,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getIntArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getIntArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -372,8 +362,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getIntObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getIntObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -389,8 +378,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getLongArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getLongArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -406,8 +394,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getLongObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getLongObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -423,8 +410,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getShortArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getShortArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -440,8 +426,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = fetchByteArrayField();
-            return TypeConversionHelper.getShortObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getShortObjectArrayFromByteArray(fetchByteArrayField());
         }
 
         String[] stringValues = fetchStringArrayField();
@@ -665,8 +650,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromBooleanArray(values));
         }
         else
         {
@@ -684,8 +668,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null)
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromBooleanObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromBooleanObjectArray(values));
         }
         else
         {
@@ -721,8 +704,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromByteObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromByteObjectArray(values));
         }
         else
         {
@@ -734,8 +716,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromCharArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromCharArray(values));
         }
         else
         {
@@ -752,8 +733,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromCharObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromCharObjectArray(values));
         }
         else
         {
@@ -765,8 +745,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromDoubleArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromDoubleArray(values));
         }
         else
         {
@@ -783,8 +762,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromDoubleObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromDoubleObjectArray(values));
         }
         else
         {
@@ -796,8 +774,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromFloatArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromFloatArray(values));
         }
         else
         {
@@ -814,8 +791,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromFloatObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromFloatObjectArray(values));
         }
         else
         {
@@ -827,8 +803,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromIntArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromIntArray(values));
         }
         else
         {
@@ -845,8 +820,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromIntObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromIntObjectArray(values));
         }
         else
         {
@@ -858,8 +832,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromLongArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromLongArray(values));
         }
         else
         {
@@ -876,8 +849,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromLongObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromLongObjectArray(values));
         }
         else
         {
@@ -889,8 +861,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromShortArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromShortArray(values));
         }
         else
         {
@@ -907,8 +878,7 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
     {
         if (mmd.getJoinMetaData() == null) // This seems more like serialised to me
         {
-            byte[] bytes = TypeConversionHelper.getByteArrayFromShortObjectArray(values);
-            storeByteArrayField(bytes);
+            storeByteArrayField(ArrayConversionHelper.getByteArrayFromShortObjectArray(values));
         }
         else
         {
@@ -956,5 +926,4 @@ public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
         names.add(name);
         return names;
     }
-
 }
