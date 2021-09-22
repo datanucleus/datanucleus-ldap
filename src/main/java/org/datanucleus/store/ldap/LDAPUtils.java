@@ -189,7 +189,7 @@ public class LDAPUtils
 
     /**
      * Gets the relative distinguished name for object.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @return the RDN for object
      */
     private static Rdn getRdnForObject(StoreManager storeMgr, ObjectProvider op) throws InvalidNameException
@@ -213,7 +213,7 @@ public class LDAPUtils
      * Convenience method to return the distinguished name for the object being managed. Uses the extension "dn" if
      * specified, else the "table" if specified as parent container. Uses the PK name and value as RDN.
      * @param storeMgr Store Manager
-     * @param op ObjectProvider
+     * @param op StateManager
      * @return Distinguished name
      */
     public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider op)
@@ -225,7 +225,7 @@ public class LDAPUtils
      * Convenience method to return the distinguished name for the object being managed. Uses the extension "dn" if
      * specified, else the "table" if specified as parent container. Uses the PK name and value as RDN.
      * @param storeMgr Store Manager
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param forceFetchHierarchicalMappedDn true to fetch the name from directory server
      * @return Distinguished name
      */
@@ -627,7 +627,7 @@ public class LDAPUtils
     /**
      * Gets the attribute value of an specific attribute name from the ObjectProvider.
      * @param storeMgr Store Manager
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param attributeName the attribute name
      * @return the attribute value
      */
@@ -658,7 +658,7 @@ public class LDAPUtils
     /**
      * Gets the attribute value of an specific attribute name from LDAP.
      * @param storeMgr Store Manager
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param attributeName the attribute name
      * @return the attribute value
      */

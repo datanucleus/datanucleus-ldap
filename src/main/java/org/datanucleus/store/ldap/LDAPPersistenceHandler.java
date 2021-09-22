@@ -91,7 +91,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Insert the object managed by the passed ObjectProvider into the LDAP datastore.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
     public void insertObject(final ObjectProvider op)
@@ -233,7 +233,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Updates the specified fields of the object managed by the passed ObjectProvider in the LDAP datastore.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      * @throws NucleusOptimisticException thrown if version checking fails
      */
@@ -339,7 +339,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Deletes the object managed by the passed ObjectProvider from the LDAP datastore.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      * @throws NucleusOptimisticException thrown if version checking fails on an optimistic transaction for this object
      */
@@ -422,7 +422,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Deletes DN references to the given state manager
-     * @param op ObjectProvider
+     * @param op StateManager
      */
     private void deleteDnReferences(ObjectProvider op)
     {
@@ -491,7 +491,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     /**
      * Deletes the DN reference from all classes of given class meta data to the given state manager
      * @param cmd the class meta data of the object where the reference should be removed from
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param emptyValue the value used for an empty member attribute
      */
     private void deleteDnReference(AbstractClassMetaData cmd, String name, ObjectProvider op, Object emptyValue)
@@ -553,7 +553,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Deletes attribute references to the given ObjectProvider
-     * @param op ObjectProvider
+     * @param op StateManager
      */
     private void deleteAttributeReferences(ObjectProvider op)
     {
@@ -629,7 +629,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * @param cmd the class meta data of the object where the reference should be removed from
      * @param attributeName the attribute name to search for
      * @param attributeValue the attribute value to search for
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param emptyValue the value used for an empty member attribute
      */
     private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue, ObjectProvider op, Object emptyValue)
@@ -688,7 +688,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Method to retrieve the specified fields of the object managed by the ObjectProvider.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param fieldNumbers Absolute field numbers to retrieve
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
@@ -800,7 +800,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Locates the object managed by the passed ObjectProvider into the LDAP datastore.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @throws NucleusObjectNotFoundException if the object cannot be located
      */
     public void locateObject(ObjectProvider op)

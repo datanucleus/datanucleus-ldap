@@ -55,7 +55,7 @@ public abstract class AbstractMappingStrategy
 
     /**
      * Instantiates a new abstract mapping strategy.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param mmd Metadata for the member
      * @param attributes the attributes
      */
