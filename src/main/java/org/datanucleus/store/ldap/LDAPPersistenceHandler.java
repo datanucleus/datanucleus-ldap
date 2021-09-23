@@ -687,7 +687,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     }
 
     /**
-     * Method to retrieve the specified fields of the object managed by the ObjectProvider.
+     * Method to retrieve the specified fields of the object managed by StateManager.
      * @param sm StateManager
      * @param fieldNumbers Absolute field numbers to retrieve
      * @throws NucleusDataStoreException when an error occurs in the datastore communication

@@ -625,7 +625,7 @@ public class LDAPUtils
      */
 
     /**
-     * Gets the attribute value of an specific attribute name from the ObjectProvider.
+     * Gets the attribute value of an specific attribute name from StateManager.
      * @param storeMgr Store Manager
      * @param sm StateManager
      * @param attributeName the attribute name
@@ -1037,7 +1037,7 @@ public class LDAPUtils
     }
 
     /**
-     * Accessor for the ObjectProvider of an object given the object AID.
+     * Accessor for StateManager of an object given the object AID.
      * Note that this is moved from ExecutionContextImpl since only LDAP uses it now.
      * @param ec ExecutionContext
      * @param pcCls Type of the PC object
