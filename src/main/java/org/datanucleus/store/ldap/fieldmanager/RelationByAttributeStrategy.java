@@ -99,7 +99,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 if (mmd.hasCollection())
                 {
                     Collection<Object> coll = getAttributeMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, joinAttributeValue);
-                    return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                    return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
                 }
             }
 
@@ -145,7 +145,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 {
                     throw new NucleusException("Error in trying to create object of type " + instanceType.getName(), e);
                 }
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
             }
         }
 
@@ -164,7 +164,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
             RelationType relationType = mmd.getRelationType(clr);
             if (mappingMetaData.getNonOwnerMMD() == mmd)
             {
-                Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, op, joinAttributeName);
+                Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, sm, joinAttributeName);
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     addAttributeReference(value, ownerAttributeName, joinAttributeValue, emptyValue);
@@ -230,7 +230,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
     {
         if (value != null)
         {
-            LDAPUtils.unmarkForDeletion(op.getObject(), ec);
+            LDAPUtils.unmarkForDeletion(sm.getObject(), ec);
         }
 
         String ownerAttributeName = mappingMetaData.getOwnerAttributeName();
@@ -242,7 +242,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         if (mappingMetaData.getNonOwnerMMD() == mmd)
         {
             // other object is owner of the relation
-            Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, op, joinAttributeName);
+            Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, sm, joinAttributeName);
 
             if (value != null)
             {
@@ -304,7 +304,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         }
                         else
                         {
-                            throw new NucleusDataStoreException("No old collection in ObjectProvider " + op);
+                            throw new NucleusDataStoreException("No old collection in ObjectProvider " + sm);
                         }
                     }
                 }
@@ -341,7 +341,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         // cascade-delete/dependent-element
                         if (mmd.getCollection().isDependentElement())
                         {
-                            Collection<Object> attributeValues = LDAPUtils.getAttributeValuesFromLDAP(storeMgr, op, ownerAttributeName);
+                            Collection<Object> attributeValues = LDAPUtils.getAttributeValuesFromLDAP(storeMgr, sm, ownerAttributeName);
                             Collection<Object> oldColl = null;
                             Class instanceType = mmd.getType();
                             instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);

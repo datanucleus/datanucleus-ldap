@@ -91,30 +91,30 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Insert the object managed by the passed ObjectProvider into the LDAP datastore.
-     * @param op StateManager
+     * @param sm StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void insertObject(final ObjectProvider op)
+    public void insertObject(final ObjectProvider sm)
     {
         // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(op);
+        assertReadOnlyForUpdateOfObject(sm);
 
         // pre-insert
         // for hierarchical mapping: ensure that parent is created before child entry
-        AbstractClassMetaData cmd = op.getClassMetaData();
-        if (LDAPUtils.isHierarchicalMappedAtChild(op))
+        AbstractClassMetaData cmd = sm.getClassMetaData();
+        if (LDAPUtils.isHierarchicalMappedAtChild(sm))
         {
             LocationInfo locationInfo = LDAPUtils.getLocationInfo(cmd);
             AbstractMemberMetaData parentFieldMmd = cmd.getMetaDataForMember(locationInfo.parentFieldName);
-            Object parentFieldValue = op.provideField(parentFieldMmd.getAbsoluteFieldNumber());
+            Object parentFieldValue = sm.provideField(parentFieldMmd.getAbsoluteFieldNumber());
             if (parentFieldValue != null)
             {
                 // compose DN using parent DN
-                op.getExecutionContext().findObjectProvider(parentFieldValue, true);
+                sm.getExecutionContext().findObjectProvider(parentFieldValue, true);
             }
             else if (locationInfo.dn == null)
             {
-                throw new NucleusUserException(Localiser.msg("LDAP.Insert.MissingParentReference", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                throw new NucleusUserException(Localiser.msg("LDAP.Insert.MissingParentReference", sm.getObjectAsPrintable(), sm.getInternalObjectId()));
             }
         }
 
@@ -127,21 +127,21 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             throw new NucleusUserException(Localiser.msg("LDAP.DatastoreID"));
         }
 
-        Set<String> objectClasses = LDAPUtils.getObjectClassesForClass(op.getClassMetaData());
+        Set<String> objectClasses = LDAPUtils.getObjectClassesForClass(sm.getClassMetaData());
         if (objectClasses == null)
         {
             throw new NucleusDataStoreException("Missing 'objectClass' extension or 'schema' attribute for class " + cmd.getName());
         }
 
         // insert
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Insert.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Insert.Start", sm.getObjectAsPrintable(), sm.getInternalObjectId()));
             }
 
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -171,8 +171,8 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             }
 
             // 1st: non-embedded members
-            op.provideFields(nonEmbeddedFieldNumbers, new StoreFieldManager(storeMgr, op, attrs, true));
-            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, false);
+            sm.provideFields(nonEmbeddedFieldNumbers, new StoreFieldManager(storeMgr, sm, attrs, true));
+            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, false);
             BasicAttribute objectClass = new BasicAttribute("objectClass");
             for (String oc : objectClasses)
             {
@@ -191,7 +191,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             // insert embedded child objects
             // insertEmbeddedChildEntries(sm, ctx);
             attrs = new BasicAttributes();
-            op.provideFields(embeddedFieldNumbers, new StoreFieldManager(storeMgr, op, attrs, true));
+            sm.provideFields(embeddedFieldNumbers, new StoreFieldManager(storeMgr, sm, attrs, true));
             if (attrs.size() > 0)
             {
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
@@ -213,13 +213,13 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(Localiser.msg("LDAP.Insert.ObjectPersisted", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("LDAP.Insert.ObjectPersisted", sm.getObjectAsPrintable(), sm.getInternalObjectId()));
             }
         }
         catch (NameAlreadyBoundException e)
         {
             throw new NucleusUserException(Localiser.msg("LDAP.Insert.ObjectWithIdAlreadyExists",
-                op.getObjectAsPrintable(), op.getInternalObjectId()), e);
+                sm.getObjectAsPrintable(), sm.getInternalObjectId()), e);
         }
         catch (NamingException e)
         {
@@ -233,24 +233,24 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Updates the specified fields of the object managed by the passed ObjectProvider in the LDAP datastore.
-     * @param op StateManager
+     * @param sm StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      * @throws NucleusOptimisticException thrown if version checking fails
      */
-    public void updateObject(final ObjectProvider op, int[] fieldNumbers)
+    public void updateObject(final ObjectProvider sm, int[] fieldNumbers)
     {
         // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(op);
+        assertReadOnlyForUpdateOfObject(sm);
 
         // TODO Implement version checking
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                AbstractClassMetaData cmd = op.getClassMetaData();
+                AbstractClassMetaData cmd = sm.getClassMetaData();
                 StringBuilder fieldStr = new StringBuilder();
                 for (int i = 0; i < fieldNumbers.length; i++)
                 {
@@ -260,7 +260,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                     }
                     fieldStr.append(cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]).getName());
                 }
-                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Update.Start", op.getObjectAsPrintable(), op.getInternalObjectId(), fieldStr.toString()));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Update.Start", sm.getObjectAsPrintable(), sm.getInternalObjectId(), fieldStr.toString()));
             }
 
             DirContext ctx = (DirContext) mconn.getConnection();
@@ -268,8 +268,8 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             // pre-update
             // for hierarchical mapping: check if parent has been changed
             // in that case move the entry to the other tree (moddn operation)
-            AbstractClassMetaData cmd = op.getClassMetaData();
-            if (LDAPUtils.isHierarchicalMappedAtChild(op))
+            AbstractClassMetaData cmd = sm.getClassMetaData();
+            if (LDAPUtils.isHierarchicalMappedAtChild(sm))
             {
                 LocationInfo locationInfo = LDAPUtils.getLocationInfo(cmd);
                 AbstractMemberMetaData parentFieldMmd = cmd.getMetaDataForMember(locationInfo.parentFieldName);
@@ -279,25 +279,25 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                     if (i == absoluteFieldNumber)
                     {
                         // TODO: manual move for non-leaf entry?
-                        LdapName oldDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
-                        op.setAssociatedValue("dn", null);
+                        LdapName oldDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
+                        sm.setAssociatedValue("dn", null);
                         LdapName newDn = null;
 
-                        Object parentFieldValue = op.provideField(absoluteFieldNumber);
+                        Object parentFieldValue = sm.provideField(absoluteFieldNumber);
                         if (parentFieldValue != null)
                         {
-                            newDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, false);
+                            newDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, false);
                         }
                         else if (locationInfo.dn != null)
                         {
                             // construct new DN without parent -> put to fixed DN
-                            newDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, false);
+                            newDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, false);
                         }
 
                         if (newDn != null && !oldDn.equals(newDn))
                         {
-                            LDAPUtils.markForRename(storeMgr, op.getObject(), ec, oldDn, newDn);
-                            LDAPUtils.unmarkForDeletion(op.getObject(), ec);
+                            LDAPUtils.markForRename(storeMgr, sm.getObject(), ec, oldDn, newDn);
+                            LDAPUtils.unmarkForDeletion(sm.getObject(), ec);
                         }
                         break;
                     }
@@ -306,8 +306,8 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
             // update
             final BasicAttributes attrs = new BasicAttributes();
-            op.provideFields(fieldNumbers, new StoreFieldManager(storeMgr, op, attrs, false));
-            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
+            sm.provideFields(fieldNumbers, new StoreFieldManager(storeMgr, sm, attrs, false));
+            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
             // replace attributes, empty attribute deletes existing attribute
             if (attrs.size() > 0)
             {
@@ -339,27 +339,27 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Deletes the object managed by the passed ObjectProvider from the LDAP datastore.
-     * @param op StateManager
+     * @param sm StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      * @throws NucleusOptimisticException thrown if version checking fails on an optimistic transaction for this object
      */
-    public void deleteObject(ObjectProvider op)
+    public void deleteObject(ObjectProvider sm)
     {
         // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(op);
-        NucleusLogger.GENERAL.info(">> deleteObject for " + op);
+        assertReadOnlyForUpdateOfObject(sm);
+        NucleusLogger.GENERAL.info(">> deleteObject for " + sm);
 
         // Delete all reachable PC objects (due to dependent-field)
-        op.loadUnloadedFields();
-        op.provideFields(op.getClassMetaData().getAllMemberPositions(), new DeleteFieldManager(op));
+        sm.loadUnloadedFields();
+        sm.provideFields(sm.getClassMetaData().getAllMemberPositions(), new DeleteFieldManager(sm));
 
         // referential integrity: check if this sm is referenced from somewhere in that case remove the reference
-        deleteDnReferences(op);
-        deleteAttributeReferences(op);
+        deleteDnReferences(sm);
+        deleteAttributeReferences(sm);
 
         // delete
         // TODO Implement version checking
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         DirContext ctx = (DirContext) mconn.getConnection();
         long startTime = System.currentTimeMillis();
@@ -367,11 +367,11 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         {
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Delete.Start", op.getObjectAsPrintable(), op
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.Delete.Start", sm.getObjectAsPrintable(), sm
                         .getInternalObjectId()));
             }
 
-            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
+            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.destroySubcontext", dn));
@@ -395,10 +395,10 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.DeleteRecursive.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("LDAP.DeleteRecursive.Start", sm.getObjectAsPrintable(), sm.getInternalObjectId()));
                 }
 
-                LDAPUtils.deleteRecursive(LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true), ctx);
+                LDAPUtils.deleteRecursive(LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true), ctx);
 
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
@@ -422,23 +422,23 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Deletes DN references to the given state manager
-     * @param op StateManager
+     * @param sm StateManager
      */
-    private void deleteDnReferences(ObjectProvider op)
+    private void deleteDnReferences(ObjectProvider sm)
     {
         // 1st) this sm itself has a DN reference with <element>
-        int[] fieldNumbers = op.getClassMetaData().getAllMemberPositions();
+        int[] fieldNumbers = sm.getClassMetaData().getAllMemberPositions();
         for (int fieldNumber : fieldNumbers)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            if (RelationByDnMetaData.isRelationByDn(mmd, op.getExecutionContext().getMetaDataManager()))
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            if (RelationByDnMetaData.isRelationByDn(mmd, sm.getExecutionContext().getMetaDataManager()))
             {
                 ElementMetaData elementMetaData = mmd.getElementMetaData();
                 if (elementMetaData != null)
                 {
-                    AbstractClassMetaData otherCmd = LDAPUtils.getEffectiveClassMetaData(mmd, op.getExecutionContext().getMetaDataManager());
+                    AbstractClassMetaData otherCmd = LDAPUtils.getEffectiveClassMetaData(mmd, sm.getExecutionContext().getMetaDataManager());
 
-                    Class c = op.getExecutionContext().getClassLoaderResolver().classForName(otherCmd.getFullClassName());
+                    Class c = sm.getExecutionContext().getClassLoaderResolver().classForName(otherCmd.getFullClassName());
                     if (c.isInterface() || Modifier.isAbstract(c.getModifiers()))
                     {
                         continue;
@@ -447,14 +447,14 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
                     String name = elementMetaData.getColumnName() != null ? elementMetaData.getColumnName() : elementMetaData
                             .getColumnMetaData()[0].getName();
                     String emptyValue = LDAPUtils.getEmptyValue(mmd);
-                    deleteDnReference(otherCmd, name, op, emptyValue);
+                    deleteDnReference(otherCmd, name, sm, emptyValue);
                 }
             }
         }
 
         // 2nd) any other object has a DN reference to this sm w/o <element>
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        MetaDataManager mdm = op.getExecutionContext().getMetaDataManager();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+        MetaDataManager mdm = sm.getExecutionContext().getMetaDataManager();
         Collection<String> classesWithMetaData = mdm.getClassesWithMetaData();
         for (String className : classesWithMetaData)
         {
@@ -463,7 +463,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 continue;
             }
-            Class c = op.getExecutionContext().getClassLoaderResolver().classForName(className);
+            Class c = sm.getExecutionContext().getClassLoaderResolver().classForName(className);
             if (c.isInterface() || Modifier.isAbstract(c.getModifiers()))
             {
                 continue;
@@ -472,16 +472,16 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             for (int fieldNumber : fieldNumbers)
             {
                 AbstractMemberMetaData mmd = otherCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (RelationByDnMetaData.isRelationByDn(mmd, op.getExecutionContext().getMetaDataManager()))
+                if (RelationByDnMetaData.isRelationByDn(mmd, sm.getExecutionContext().getMetaDataManager()))
                 {
-                    AbstractClassMetaData effectiveCmd = LDAPUtils.getEffectiveClassMetaData(mmd, op.getExecutionContext().getMetaDataManager());
-                    String[] subclassNames = effectiveCmd != null ? op.getExecutionContext().getMetaDataManager().getSubclassesForClass(effectiveCmd.getFullClassName(), true) : null;
-                    if (effectiveCmd == op.getClassMetaData() || (subclassNames != null && Arrays.asList(subclassNames).contains(
-                        op.getClassMetaData().getFullClassName())))
+                    AbstractClassMetaData effectiveCmd = LDAPUtils.getEffectiveClassMetaData(mmd, sm.getExecutionContext().getMetaDataManager());
+                    String[] subclassNames = effectiveCmd != null ? sm.getExecutionContext().getMetaDataManager().getSubclassesForClass(effectiveCmd.getFullClassName(), true) : null;
+                    if (effectiveCmd == sm.getClassMetaData() || (subclassNames != null && Arrays.asList(subclassNames).contains(
+                        sm.getClassMetaData().getFullClassName())))
                     {
                         String name = LDAPUtils.getAttributeNameForField(mmd);
                         String emptyValue = LDAPUtils.getEmptyValue(mmd);
-                        deleteDnReference(otherCmd, name, op, emptyValue);
+                        deleteDnReference(otherCmd, name, sm, emptyValue);
                     }
                 }
             }
@@ -491,20 +491,20 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     /**
      * Deletes the DN reference from all classes of given class meta data to the given state manager
      * @param cmd the class meta data of the object where the reference should be removed from
-     * @param op StateManager
+     * @param sm StateManager
      * @param emptyValue the value used for an empty member attribute
      */
-    private void deleteDnReference(AbstractClassMetaData cmd, String name, ObjectProvider op, Object emptyValue)
+    private void deleteDnReference(AbstractClassMetaData cmd, String name, ObjectProvider sm, Object emptyValue)
     {
         // System.out.println("deleteDnReference: " + cmd.getName() + " - " + sm);
-        LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
+        LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
 
         // search for object with (pcAttributeName=myDN)
-        ExecutionContext om = op.getExecutionContext();
+        ExecutionContext om = sm.getExecutionContext();
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(om);
         try
         {
-            LdapName base = LDAPUtils.getSearchBase(cmd, op.getExecutionContext().getMetaDataManager());
+            LdapName base = LDAPUtils.getSearchBase(cmd, sm.getExecutionContext().getMetaDataManager());
             String ocFilter = LDAPUtils.getSearchFilter(cmd);
             String dnFilter = "(" + name + "=" + dn.toString() + ")";
             String filter = ocFilter != null ? "(&" + ocFilter + dnFilter + ")" : dnFilter;
@@ -553,37 +553,37 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Deletes attribute references to the given ObjectProvider
-     * @param op StateManager
+     * @param sm StateManager
      */
-    private void deleteAttributeReferences(ObjectProvider op)
+    private void deleteAttributeReferences(ObjectProvider sm)
     {
         // 1st) this sm itself has a attribute reference with <element>
-        int[] fieldNumbers = op.getClassMetaData().getAllMemberPositions();
+        int[] fieldNumbers = sm.getClassMetaData().getAllMemberPositions();
         for (int fieldNumber : fieldNumbers)
         {
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            if (RelationByAttributeMetaData.isRelationByAttribute(mmd, op.getExecutionContext().getMetaDataManager()))
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            if (RelationByAttributeMetaData.isRelationByAttribute(mmd, sm.getExecutionContext().getMetaDataManager()))
             {
                 ElementMetaData elementMetaData = mmd.getElementMetaData();
                 if (elementMetaData != null)
                 {
-                    RelationByAttributeMetaData mappingMetaData = new RelationByAttributeMetaData(mmd, op.getExecutionContext().getMetaDataManager());
+                    RelationByAttributeMetaData mappingMetaData = new RelationByAttributeMetaData(mmd, sm.getExecutionContext().getMetaDataManager());
                     if (mappingMetaData.getNonOwnerMMD() == mmd)
                     {
                         String ownerAttributeName = mappingMetaData.getOwnerAttributeName();
                         String joinAttributeName = mappingMetaData.getJoinAttributeName();
-                        Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, op, joinAttributeName);
+                        Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, sm, joinAttributeName);
                         String emptyValue = LDAPUtils.getEmptyValue(mmd);
-                        AbstractClassMetaData otherCmd = LDAPUtils.getEffectiveClassMetaData(mmd, op.getExecutionContext().getMetaDataManager());
-                        deleteAttributeReference(otherCmd, ownerAttributeName, joinAttributeValue, op, emptyValue);
+                        AbstractClassMetaData otherCmd = LDAPUtils.getEffectiveClassMetaData(mmd, sm.getExecutionContext().getMetaDataManager());
+                        deleteAttributeReference(otherCmd, ownerAttributeName, joinAttributeValue, sm, emptyValue);
                     }
                 }
             }
         }
 
         // 2nd) any other object has an attribute reference to this sm w/o <element>
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        MetaDataManager mdm = op.getExecutionContext().getMetaDataManager();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+        MetaDataManager mdm = sm.getExecutionContext().getMetaDataManager();
         Collection<String> classesWithMetaData = mdm.getClassesWithMetaData();
         for (String className : classesWithMetaData)
         {
@@ -592,7 +592,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             {
                 continue;
             }
-            Class c = op.getExecutionContext().getClassLoaderResolver().classForName(className);
+            Class c = sm.getExecutionContext().getClassLoaderResolver().classForName(className);
             if (c.isInterface() || Modifier.isAbstract(c.getModifiers()))
             {
                 continue;
@@ -601,22 +601,22 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             for (int fieldNumber : fieldNumbers)
             {
                 AbstractMemberMetaData mmd = otherCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-                if (RelationByAttributeMetaData.isRelationByAttribute(mmd, op.getExecutionContext().getMetaDataManager()))
+                if (RelationByAttributeMetaData.isRelationByAttribute(mmd, sm.getExecutionContext().getMetaDataManager()))
                 {
-                    AbstractClassMetaData effectiveCmd = LDAPUtils.getEffectiveClassMetaData(mmd, op.getExecutionContext().getMetaDataManager());
-                    String[] subclassNames = effectiveCmd != null ? op.getExecutionContext().getMetaDataManager().getSubclassesForClass(
+                    AbstractClassMetaData effectiveCmd = LDAPUtils.getEffectiveClassMetaData(mmd, sm.getExecutionContext().getMetaDataManager());
+                    String[] subclassNames = effectiveCmd != null ? sm.getExecutionContext().getMetaDataManager().getSubclassesForClass(
                         effectiveCmd.getFullClassName(), true) : null;
-                    if (effectiveCmd == op.getClassMetaData() || (subclassNames != null && Arrays.asList(subclassNames).contains(
-                        op.getClassMetaData().getFullClassName())))
+                    if (effectiveCmd == sm.getClassMetaData() || (subclassNames != null && Arrays.asList(subclassNames).contains(
+                        sm.getClassMetaData().getFullClassName())))
                     {
-                        RelationByAttributeMetaData mappingMetaData = new RelationByAttributeMetaData(mmd, op.getExecutionContext().getMetaDataManager());
+                        RelationByAttributeMetaData mappingMetaData = new RelationByAttributeMetaData(mmd, sm.getExecutionContext().getMetaDataManager());
                         if (mappingMetaData.getOwnerMMD() == mmd)
                         {
                             String ownerAttributeName = mappingMetaData.getOwnerAttributeName();
                             String joinAttributeName = mappingMetaData.getJoinAttributeName();
-                            Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, op, joinAttributeName);
+                            Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, sm, joinAttributeName);
                             String emptyValue = LDAPUtils.getEmptyValue(mmd);
-                            deleteAttributeReference(otherCmd, ownerAttributeName, joinAttributeValue, op, emptyValue);
+                            deleteAttributeReference(otherCmd, ownerAttributeName, joinAttributeValue, sm, emptyValue);
                         }
                     }
                 }
@@ -629,17 +629,17 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * @param cmd the class meta data of the object where the reference should be removed from
      * @param attributeName the attribute name to search for
      * @param attributeValue the attribute value to search for
-     * @param op StateManager
+     * @param sm StateManager
      * @param emptyValue the value used for an empty member attribute
      */
-    private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue, ObjectProvider op, Object emptyValue)
+    private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue, ObjectProvider sm, Object emptyValue)
     {
         // search for object with (pcAttributeName=myDN)
-        ExecutionContext om = op.getExecutionContext();
+        ExecutionContext om = sm.getExecutionContext();
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(om);
         try
         {
-            LdapName base = LDAPUtils.getSearchBase(cmd, op.getExecutionContext().getMetaDataManager());
+            LdapName base = LDAPUtils.getSearchBase(cmd, sm.getExecutionContext().getMetaDataManager());
             String ocFilter = LDAPUtils.getSearchFilter(cmd);
             String dnFilter = "(" + attributeName + "=" + attributeValue + ")";
             String filter = ocFilter != null ? "(&" + ocFilter + dnFilter + ")" : dnFilter;
@@ -688,24 +688,24 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Method to retrieve the specified fields of the object managed by the ObjectProvider.
-     * @param op StateManager
+     * @param sm StateManager
      * @param fieldNumbers Absolute field numbers to retrieve
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void fetchObject(final ObjectProvider op, int[] fieldNumbers)
+    public void fetchObject(final ObjectProvider sm, int[] fieldNumbers)
     {
-        if (op.getLifecycleState().isDeleted())
+        if (sm.getLifecycleState().isDeleted())
         {
             return;
         }
 
-        AbstractClassMetaData cmd = op.getClassMetaData();
+        AbstractClassMetaData cmd = sm.getClassMetaData();
         if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
             StringBuilder str = new StringBuilder("Fetching object \"");
-            str.append(op.getObjectAsPrintable()).append("\" (id=");
-            str.append(op.getInternalObjectId()).append(")").append(" fields [");
+            str.append(sm.getObjectAsPrintable()).append("\" (id=");
+            str.append(sm.getInternalObjectId()).append(")").append(" fields [");
             for (int i = 0; i < fieldNumbers.length; i++)
             {
                 if (i > 0)
@@ -719,7 +719,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         }
 
         List<String> attributeNameList = new ArrayList<String>();
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         for (int i = 0; i < fieldNumbers.length; i++)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
@@ -731,7 +731,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             }
             else
             {
-                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, new BasicAttributes());
+                AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, sm, mmd, new BasicAttributes());
                 if (ms != null)
                 {
                     List<String> attributeNames = ms.getAttributeNames();
@@ -741,7 +741,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         }
         String[] attributeNames = attributeNameList.toArray(new String[0]);
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
@@ -750,17 +750,17 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Fetch.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Fetch.Start", sm.getObjectAsPrintable(), sm.getInternalObjectId()));
             }
 
-            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
+            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.getAttributes", dn, attributeNameList, ""));
             }
 
             final Attributes result = ctx.getAttributes(dn, attributeNames);
-            op.replaceFields(fieldNumbers, new FetchFieldManager(storeMgr, op, result));
+            sm.replaceFields(fieldNumbers, new FetchFieldManager(storeMgr, sm, result));
 
             if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
             {
@@ -774,7 +774,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
         }
         catch (NameNotFoundException e)
         {
-            throw new NucleusObjectNotFoundException("Object not found", op.getInternalObjectId());
+            throw new NucleusObjectNotFoundException("Object not found", sm.getInternalObjectId());
         }
         catch (NamingException e)
         {
@@ -800,25 +800,25 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Locates the object managed by the passed ObjectProvider into the LDAP datastore.
-     * @param op StateManager
+     * @param sm StateManager
      * @throws NucleusObjectNotFoundException if the object cannot be located
      */
-    public void locateObject(ObjectProvider op)
+    public void locateObject(ObjectProvider sm)
     {
-        final AbstractClassMetaData cmd = op.getClassMetaData();
+        final AbstractClassMetaData cmd = sm.getClassMetaData();
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 long startTime = System.currentTimeMillis();
                 if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Locate.Start", op.getObjectAsPrintable(), op.getInternalObjectId()));
+                    NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("LDAP.Locate.Start", sm.getObjectAsPrintable(), sm.getInternalObjectId()));
                 }
                 DirContext ctx = (DirContext) mconn.getConnection();
-                LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
+                LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
                 if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
                 {
                     NucleusLogger.DATASTORE_NATIVE.debug(Localiser.msg("LDAP.JNDI.getAttributes", dn, "none", ""));
@@ -836,7 +836,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             }
             catch (NameNotFoundException e)
             {
-                throw new NucleusObjectNotFoundException("Object not found", op.getInternalObjectId());
+                throw new NucleusObjectNotFoundException("Object not found", sm.getInternalObjectId());
             }
             catch (NamingException e)
             {

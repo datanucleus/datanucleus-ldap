@@ -64,9 +64,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     protected ClassLoaderResolver clr;
 
-    protected EmbeddedMappingStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
+    protected EmbeddedMappingStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
-        super(op, mmd, attributes);
+        super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
         this.storeMgr = storeMgr;
         this.clr = ec.getClassLoaderResolver();
@@ -96,7 +96,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 Class instanceType = mmd.getType();
                 instanceType = org.datanucleus.store.types.SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
                 Collection<Object> coll = fetchFromChildren(instanceType);
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
             }
         }
 
@@ -165,7 +165,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
         // search
         Collection<Object> coll = getCollectionInstance(collectionType);
-        LdapName baseDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op);
+        LdapName baseDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm);
 
         // search exact type
         Map<LdapName, Attributes> entries = LDAPUtils.getEntries(storeMgr, ec, effectiveClassMetaData, baseDn, null, false, false);
@@ -227,7 +227,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
                 if (fieldName.equals(embeddedMetaData.getOwnerMember()))
                 {
-                    embeddedSM.replaceField(embFieldNum, op.getObject());
+                    embeddedSM.replaceField(embFieldNum, sm.getObject());
                 }
                 else if (embeddedMmd.isPrimaryKey())
                 {
@@ -291,7 +291,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     private ObjectProvider getEmbeddedObjectProvider(Object value)
     {
-        return ec.findObjectProviderForEmbedded(value, op, mmd);
+        return ec.findObjectProviderForEmbedded(value, sm, mmd);
     }
 
     @Override
@@ -400,7 +400,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
             if (fieldName.equals(embeddedMetaData.getOwnerMember()))
             {
-                embeddedSM.replaceField(embFieldNum, op.getObject());
+                embeddedSM.replaceField(embFieldNum, sm.getObject());
             }
             else if (embeddedMmd.isPrimaryKey())
             {
@@ -443,7 +443,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 // embedded as child-entry
                 // fetch old value, need to replace it afterwards
                 Object oldValue = fetchFromChild();
-                op.replaceField(fieldNumber, value);
+                sm.replaceField(fieldNumber, value);
                 EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
                 if (value == null)
                 {
@@ -648,7 +648,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
             if (fieldName.equals(embeddedMetaData.getOwnerMember()))
             {
-                embeddedSM.replaceField(i, op.getObject());
+                embeddedSM.replaceField(i, sm.getObject());
             }
             else if (embeddedMmd.isPrimaryKey())
             {

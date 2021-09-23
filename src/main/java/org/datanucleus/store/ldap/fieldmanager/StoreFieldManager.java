@@ -42,14 +42,14 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class StoreFieldManager extends AbstractFieldManager
 {
-    ObjectProvider op;
+    ObjectProvider sm;
     StoreManager storeMgr;
     Attributes attributes;
     boolean insert;
 
-    public StoreFieldManager(StoreManager storeMgr, ObjectProvider op, Attributes attrs, boolean insert)
+    public StoreFieldManager(StoreManager storeMgr, ObjectProvider sm, Attributes attrs, boolean insert)
     {
-        this.op = op;
+        this.sm = sm;
         this.storeMgr = storeMgr;
         this.attributes = attrs;
         this.insert = insert;
@@ -57,9 +57,9 @@ public class StoreFieldManager extends AbstractFieldManager
 
     public void storeObjectField(int fieldNumber, Object value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         String name = LDAPUtils.getAttributeNameForField(mmd);
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         RelationType relType = mmd.getRelationType(clr);
         if (relType == RelationType.NONE)
         {
@@ -76,7 +76,7 @@ public class StoreFieldManager extends AbstractFieldManager
                 }
                 else
                 {
-                    Attribute attr = SimpleContainerHelper.storeCollection(mmd, value, op.getExecutionContext().getTypeManager(), clr);
+                    Attribute attr = SimpleContainerHelper.storeCollection(mmd, value, sm.getExecutionContext().getTypeManager(), clr);
                     attributes.put(attr);
                 }
                 return;
@@ -93,7 +93,7 @@ public class StoreFieldManager extends AbstractFieldManager
                 }
                 else
                 {
-                    Attribute attr = SimpleContainerHelper.storeArray(mmd, value, op.getExecutionContext().getTypeManager());
+                    Attribute attr = SimpleContainerHelper.storeArray(mmd, value, sm.getExecutionContext().getTypeManager());
                     attributes.put(attr);
                 }
                 return;
@@ -181,7 +181,7 @@ public class StoreFieldManager extends AbstractFieldManager
                     }
                     else
                     {
-                        converter = op.getExecutionContext().getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
+                        converter = sm.getExecutionContext().getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
                     }
                     if (converter != null)
                     {
@@ -196,7 +196,7 @@ public class StoreFieldManager extends AbstractFieldManager
         else
         {
             // Relationship field, so use mapping strategy where supported
-            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, attributes);
+            AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, sm, mmd, attributes);
             if (ms != null)
             {
                 if (insert)
@@ -217,7 +217,7 @@ public class StoreFieldManager extends AbstractFieldManager
 
     public void storeBooleanField(int fieldNumber, boolean value)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         String name = LDAPUtils.getAttributeNameForField(mmd);
 
         // Apache Directory 1.5+ seems to require uppercase for booleans
@@ -272,7 +272,7 @@ public class StoreFieldManager extends AbstractFieldManager
             stringValue = null;
         }
 
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         String name = LDAPUtils.getAttributeNameForField(mmd);
 
         if (stringValue == null)

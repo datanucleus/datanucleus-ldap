@@ -189,20 +189,20 @@ public class LDAPUtils
 
     /**
      * Gets the relative distinguished name for object.
-     * @param op StateManager
+     * @param sm StateManager
      * @return the RDN for object
      */
-    private static Rdn getRdnForObject(StoreManager storeMgr, ObjectProvider op) throws InvalidNameException
+    private static Rdn getRdnForObject(StoreManager storeMgr, ObjectProvider sm) throws InvalidNameException
     {
-        AbstractClassMetaData cmd = op.getClassMetaData();
+        AbstractClassMetaData cmd = sm.getClassMetaData();
         // TODO Cater for composite PK
         int fieldNumber = cmd.getPKMemberPositions()[0];
 //        Object value = op.provideField(fieldNumber);
 //        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         Attributes rdnAttributes = new BasicAttributes();
 
-        StoreFieldManager storeFM = new StoreFieldManager(storeMgr, op, rdnAttributes, true);
-        op.provideFields(new int[]{fieldNumber}, storeFM);
+        StoreFieldManager storeFM = new StoreFieldManager(storeMgr, sm, rdnAttributes, true);
+        sm.provideFields(new int[]{fieldNumber}, storeFM);
 //        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, rdnAttributes);
 //        ms.insert(value);
 
@@ -213,62 +213,62 @@ public class LDAPUtils
      * Convenience method to return the distinguished name for the object being managed. Uses the extension "dn" if
      * specified, else the "table" if specified as parent container. Uses the PK name and value as RDN.
      * @param storeMgr Store Manager
-     * @param op StateManager
+     * @param sm StateManager
      * @return Distinguished name
      */
-    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider op)
+    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider sm)
     {
-        return getDistinguishedNameForObject(storeMgr, op, false);
+        return getDistinguishedNameForObject(storeMgr, sm, false);
     }
 
     /**
      * Convenience method to return the distinguished name for the object being managed. Uses the extension "dn" if
      * specified, else the "table" if specified as parent container. Uses the PK name and value as RDN.
      * @param storeMgr Store Manager
-     * @param op StateManager
+     * @param sm StateManager
      * @param forceFetchHierarchicalMappedDn true to fetch the name from directory server
      * @return Distinguished name
      */
-    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider op, boolean forceFetchHierarchicalMappedDn)
+    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider sm, boolean forceFetchHierarchicalMappedDn)
     {
-        return getDistinguishedNameForObject(storeMgr, op, null, forceFetchHierarchicalMappedDn);
+        return getDistinguishedNameForObject(storeMgr, sm, null, forceFetchHierarchicalMappedDn);
     }
 
-    private static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider op, Set<ObjectProvider> handledOPs,
+    private static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider sm, Set<ObjectProvider> handledOPs,
             boolean forceFetchHierarchicalMappedDn)
     {
         if (handledOPs == null)
         {
             handledOPs = new HashSet<ObjectProvider>();
         }
-        if (handledOPs.contains(op))
+        if (handledOPs.contains(sm))
         {
-            throw new NucleusDataStoreException("Recursive loop detected while creating distinguished name for " + op);
+            throw new NucleusDataStoreException("Recursive loop detected while creating distinguished name for " + sm);
         }
-        handledOPs.add(op);
+        handledOPs.add(sm);
 
-        AbstractClassMetaData cmd = op.getClassMetaData();
+        AbstractClassMetaData cmd = sm.getClassMetaData();
         LocationInfo locationInfo = getLocationInfo(cmd);
 
         LdapName dn;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         try
         {
             SearchControls searchControls = getSearchControls(cmd);
-            ObjectProvider[] embOwnerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
-            if (embOwnerOPs != null && embOwnerOPs.length > 0)
+            ObjectProvider[] embOwnerSMs = ec.getOwnersForEmbeddedObjectProvider(sm);
+            if (embOwnerSMs != null && embOwnerSMs.length > 0)
             {
-                ObjectProvider owner = embOwnerOPs[0];
-                dn = getDistinguishedNameForObject(storeMgr, owner, handledOPs, forceFetchHierarchicalMappedDn);
-                dn.add(getRdnForObject(storeMgr, op));
+                ObjectProvider embOwnerSM = embOwnerSMs[0];
+                dn = getDistinguishedNameForObject(storeMgr, embOwnerSM, handledOPs, forceFetchHierarchicalMappedDn);
+                dn.add(getRdnForObject(storeMgr, sm));
             }
             else if (searchControls.getSearchScope() == SearchControls.OBJECT_SCOPE)
             {
                 dn = locationInfo.dn;
             }
-            else if (isHierarchicalMappedAtChild(op))
+            else if (isHierarchicalMappedAtChild(sm))
             {
-                Rdn rdn = getRdnForObject(storeMgr, op);
+                Rdn rdn = getRdnForObject(storeMgr, sm);
                 LdapName parentDn;
                 AbstractMemberMetaData parentFieldMmd = cmd.getMetaDataForMember(locationInfo.parentFieldName);
                 if (forceFetchHierarchicalMappedDn)
@@ -304,7 +304,7 @@ public class LDAPUtils
                             }
                             else
                             {
-                                throw new NucleusObjectNotFoundException("No distinguished name found for object " + op.toString());
+                                throw new NucleusObjectNotFoundException("No distinguished name found for object " + sm.toString());
                             }
                         }
                     }
@@ -319,7 +319,7 @@ public class LDAPUtils
                 }
                 else
                 {
-                    Object parentFieldValue = op.provideField(parentFieldMmd.getAbsoluteFieldNumber());
+                    Object parentFieldValue = sm.provideField(parentFieldMmd.getAbsoluteFieldNumber());
                     if (parentFieldValue != null)
                     {
                         // compose DN using parent DN
@@ -338,8 +338,8 @@ public class LDAPUtils
                     else
                     {
                         // no way to get the DN from the object, fetch it from directory
-                        handledOPs.remove(op);
-                        LdapName smDn = getDistinguishedNameForObject(storeMgr, op, handledOPs, true);
+                        handledOPs.remove(sm);
+                        LdapName smDn = getDistinguishedNameForObject(storeMgr, sm, handledOPs, true);
                         parentDn = getParentDistingueshedName(smDn, locationInfo.suffix);
                     }
                 }
@@ -349,7 +349,7 @@ public class LDAPUtils
             else
             {
                 dn = new LdapName(locationInfo.dn.toString());
-                dn.add(getRdnForObject(storeMgr, op));
+                dn.add(getRdnForObject(storeMgr, sm));
             }
         }
         catch (InvalidNameException e)
@@ -627,25 +627,25 @@ public class LDAPUtils
     /**
      * Gets the attribute value of an specific attribute name from the ObjectProvider.
      * @param storeMgr Store Manager
-     * @param op StateManager
+     * @param sm StateManager
      * @param attributeName the attribute name
      * @return the attribute value
      */
-    public static Object getAttributeValue(StoreManager storeMgr, ObjectProvider op, String attributeName)
+    public static Object getAttributeValue(StoreManager storeMgr, ObjectProvider sm, String attributeName)
     {
         try
         {
             // get field value of the PC
-            AbstractMemberMetaData pcMmd = LDAPUtils.getMemberMetadataForAttributeName(op.getClassMetaData(), attributeName);
+            AbstractMemberMetaData pcMmd = LDAPUtils.getMemberMetadataForAttributeName(sm.getClassMetaData(), attributeName);
             if (pcMmd == null)
             {
-                throw new NucleusUserException("Tried to find LDAP attribute " + attributeName + " in class " + op.getClassMetaData().getFullClassName() + " but not found. Metadata wrong?");
+                throw new NucleusUserException("Tried to find LDAP attribute " + attributeName + " in class " + sm.getClassMetaData().getFullClassName() + " but not found. Metadata wrong?");
             }
 
             // get LDAP value
             Attributes pcAttributes = new BasicAttributes();
-            StoreFieldManager storeFM = new StoreFieldManager(storeMgr, op, pcAttributes, true);
-            op.provideFields(new int[]{pcMmd.getAbsoluteFieldNumber()}, storeFM);
+            StoreFieldManager storeFM = new StoreFieldManager(storeMgr, sm, pcAttributes, true);
+            sm.provideFields(new int[]{pcMmd.getAbsoluteFieldNumber()}, storeFM);
             Attribute pcAttribute = pcAttributes.get(attributeName);
             return pcAttribute.get();
         }
@@ -658,16 +658,16 @@ public class LDAPUtils
     /**
      * Gets the attribute value of an specific attribute name from LDAP.
      * @param storeMgr Store Manager
-     * @param op StateManager
+     * @param sm StateManager
      * @param attributeName the attribute name
      * @return the attribute value
      */
-    public static Collection<Object> getAttributeValuesFromLDAP(StoreManager storeMgr, ObjectProvider op, String attributeName)
+    public static Collection<Object> getAttributeValuesFromLDAP(StoreManager storeMgr, ObjectProvider sm, String attributeName)
     {
-        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
         try
         {
-            LdapName dn = getDistinguishedNameForObject(storeMgr, op, true);
+            LdapName dn = getDistinguishedNameForObject(storeMgr, sm, true);
             DirContext ctx = (DirContext) mconn.getConnection();
             if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
             {
@@ -996,9 +996,9 @@ public class LDAPUtils
             Object pc = findObjectUsingAID(ec, clr.classForName(cmd.getFullClassName()), new FieldValues()
             {
                 // ObjectProvider calls the fetchFields method
-                public void fetchFields(ObjectProvider op)
+                public void fetchFields(ObjectProvider sm)
                 {
-                    op.replaceFields(cmd.getPKMemberPositions(), new FetchFieldManager(storeMgr, op, attrs));
+                    sm.replaceFields(cmd.getPKMemberPositions(), new FetchFieldManager(storeMgr, sm, attrs));
                     
                     List<AbstractMemberMetaData> allMemberMetaData = getAllMemberMetaData(cmd);
                     List<AbstractMemberMetaData> basicMemberMetaData = new ArrayList<AbstractMemberMetaData>();
@@ -1016,12 +1016,12 @@ public class LDAPUtils
                     {
                         basicMemberPosition[i] = basicMemberMetaData.get(i).getAbsoluteFieldNumber();
                     }
-                    op.replaceFields(basicMemberPosition, new FetchFieldManager(storeMgr, op, attrs));
+                    sm.replaceFields(basicMemberPosition, new FetchFieldManager(storeMgr, sm, attrs));
                 }
 
-                public void fetchNonLoadedFields(ObjectProvider op)
+                public void fetchNonLoadedFields(ObjectProvider sm)
                 {
-                    op.replaceNonLoadedFields(cmd.getAllMemberPositions(), new FetchFieldManager(storeMgr, op, attrs));
+                    sm.replaceNonLoadedFields(cmd.getAllMemberPositions(), new FetchFieldManager(storeMgr, sm, attrs));
                 }
 
                 public FetchPlan getFetchPlanForLoading()
@@ -1052,17 +1052,17 @@ public class LDAPUtils
     protected static Object findObjectUsingAID(ExecutionContext ec, Class pcCls, final FieldValues fv, boolean ignoreCache, boolean checkInheritance)
     {
         // Create ObjectProvider to generate an identity NOTE THIS IS VERY INEFFICIENT
-        ObjectProvider op = ec.getNucleusContext().getObjectProviderFactory().newForHollowPopulatedAppId(ec, pcCls, fv);
+        ObjectProvider sm = ec.getNucleusContext().getObjectProviderFactory().newForHollowPopulatedAppId(ec, pcCls, fv);
         if (!ignoreCache)
         {
             // Check the cache
-            Object oid = op.getInternalObjectId();
+            Object oid = sm.getInternalObjectId();
             Object pc = ec.getObjectFromCache(oid);
             if (pc != null)
             {
-                op = ec.findObjectProvider(pc);
+                sm = ec.findObjectProvider(pc);
                 // Note that this can cause problems like NUCRDBMS-402 due to attempt to re-read the field values
-                op.loadFieldValues(fv); // Load the values retrieved by the query
+                sm.loadFieldValues(fv); // Load the values retrieved by the query
                 return pc;
             }
             if (checkInheritance)
@@ -1087,8 +1087,8 @@ public class LDAPUtils
                             pc = ec.getObjectFromCache(oid);
                             if (pc != null)
                             {
-                                op = ec.findObjectProvider(pc);
-                                op.loadFieldValues(fv); // Load the values retrieved by the query
+                                sm = ec.findObjectProvider(pc);
+                                sm.loadFieldValues(fv); // Load the values retrieved by the query
                                 return pc;
                             }
                         }
@@ -1100,26 +1100,26 @@ public class LDAPUtils
         if (checkInheritance)
         {
             // TODO Remove this reference to ObjectProvider (should be ObjectProvider only)
-            op.checkInheritance(fv); // Find the correct PC class for this object, hence updating the object id
+            sm.checkInheritance(fv); // Find the correct PC class for this object, hence updating the object id
             if (!ignoreCache)
             {
                 // Check the cache in case this updated object id is present (since we should use that if available)
-                Object oid = op.getInternalObjectId();
+                Object oid = sm.getInternalObjectId();
                 Object pc = ec.getObjectFromCache(oid);
                 if (pc != null)
                 {
                     // We have an object with this new object id already so return it with the retrieved field values imposed
-                    op = ec.findObjectProvider(pc);
-                    op.loadFieldValues(fv); // Load the values retrieved by the query
+                    sm = ec.findObjectProvider(pc);
+                    sm.loadFieldValues(fv); // Load the values retrieved by the query
                     return pc;
                 }
             }
         }
 
         // Cache the object as required
-        ec.putObjectIntoLevel1Cache(op);
+        ec.putObjectIntoLevel1Cache(sm);
 
-        return op.getObject();
+        return sm.getObject();
     }
 
     public static Map<LdapName, Attributes> getEntries(StoreManager storeMgr, ExecutionContext ec,

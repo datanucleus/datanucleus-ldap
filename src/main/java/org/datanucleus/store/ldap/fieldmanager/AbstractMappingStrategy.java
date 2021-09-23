@@ -36,7 +36,7 @@ public abstract class AbstractMappingStrategy
     protected ExecutionContext ec;
 
     /** ObjectProvider. */
-    protected ObjectProvider op;
+    protected ObjectProvider sm;
 
     /** The JNDI attributes. */
     protected Attributes attributes;
@@ -55,14 +55,14 @@ public abstract class AbstractMappingStrategy
 
     /**
      * Instantiates a new abstract mapping strategy.
-     * @param op StateManager
+     * @param sm StateManager
      * @param mmd Metadata for the member
      * @param attributes the attributes
      */
-    protected AbstractMappingStrategy(ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
+    protected AbstractMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
-        this.ec = op.getExecutionContext();
-        this.op = op;
+        this.ec = sm.getExecutionContext();
+        this.sm = sm;
         this.mmd = mmd;
         this.attributes = attributes;
         this.type = this.mmd.getType();

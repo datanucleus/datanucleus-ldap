@@ -59,9 +59,9 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
 
     protected boolean isFieldParentOfHierarchicalMapping;
 
-    protected RelationByHierarchyStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
+    protected RelationByHierarchyStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
-        super(op, mmd, attributes);
+        super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
         this.storeMgr = storeMgr;
         this.clr = ec.getClassLoaderResolver();
@@ -79,14 +79,14 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
             {
                 // hierarchical mapped one-one relationships are always dependent!
                 mmd.setDependent(true);
-                return getHierarchicalMappedChild(mmd, op);
+                return getHierarchicalMappedChild(mmd, sm);
             }
             else if (relType == RelationType.ONE_TO_MANY_UNI || relType == RelationType.ONE_TO_MANY_BI)
             {
                 if (mmd.hasCollection())
                 {
-                    Collection<Object> coll = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, op);
-                    return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                    Collection<Object> coll = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, sm);
+                    return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
                 }
             }
         }
@@ -94,8 +94,8 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         if (isFieldParentOfHierarchicalMapping)
         {
             // this field is used for hierarchical N-1 relation, load the parent
-            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
-            LocationInfo locationInfo = LDAPUtils.getLocationInfo(op.getClassMetaData());
+            LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
+            LocationInfo locationInfo = LDAPUtils.getLocationInfo(sm.getClassMetaData());
             LdapName parentDn = LDAPUtils.getParentDistingueshedName(dn, locationInfo.suffix);
 
             Object value = null;
@@ -203,7 +203,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         {
             if (value == null)
             {
-                LDAPUtils.markForDeletion(op.getObject(), ec);
+                LDAPUtils.markForDeletion(sm.getObject(), ec);
             }
         }
         else if (isFieldHierarchicalMapped)
@@ -215,7 +215,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                 if (relType == RelationType.ONE_TO_ONE_UNI || relType == RelationType.MANY_TO_ONE_UNI)
                 {
                     // Get the initial loaded object.
-                    Object oldValue = getHierarchicalMappedChild(mmd, op);
+                    Object oldValue = getHierarchicalMappedChild(mmd, sm);
                     if (oldValue != null)
                     {
                         ObjectProvider oldValueSM = ec.findObjectProvider(oldValue, false);
@@ -252,7 +252,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                         // It was saved by FetchFieldManager and is used to determine added and removed elements.
                         // This is just a quick and dirty implementation, could use backed SCO later.
 
-                        Collection<Object> oldColl = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, op);
+                        Collection<Object> oldColl = getHierarchicalMappedChildren(mmd.getCollection().getElementType(), mmd.getMappedBy(), mmd, sm);
                         Collection<Object> toAdd = null;
                         Collection<Object> toRemove = null;
                         Class instanceType = mmd.getType();
@@ -326,7 +326,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
      */
     private boolean mustDelete(ObjectProvider pcSM)
     {
-        LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, op, true);
+        LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
         LdapName pcDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM, true);
         return pcDn.startsWith(dn);
     }
@@ -346,7 +346,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
             String methodName = ClassUtils.getJavaBeanGetterName(mappedBy, false);
             Method method = ClassUtils.getMethodForClass(clazz, methodName, null);
             Object fieldPC = method.invoke(pc);
-            Object myPC = op.getObject();
+            Object myPC = sm.getObject();
             if (fieldPC == null || fieldPC == myPC)
             {
                 return true;

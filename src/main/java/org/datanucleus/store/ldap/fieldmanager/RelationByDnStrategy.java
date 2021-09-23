@@ -89,14 +89,14 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             if (RelationType.isRelationSingleValued(relationType))
             {
                 // TODO: check empty value
-                return getDnMappedReference(effectiveClassMetaData, ownerAttributeName, op);
+                return getDnMappedReference(effectiveClassMetaData, ownerAttributeName, sm);
             }
             else if (RelationType.isRelationMultiValued(relationType))
             {
                 if (mmd.hasCollection())
                 {
-                    Collection<Object> coll = getDnMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, op);
-                    return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                    Collection<Object> coll = getDnMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, sm);
+                    return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
                 }
             }
 
@@ -142,7 +142,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 {
                     throw new NucleusException("Error in trying to create object of type " + instanceType.getName(), e);
                 }
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
             }
         }
 
@@ -160,7 +160,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             RelationType relationType = mmd.getRelationType(clr);
             if (mappingMetaData.getNonOwnerMMD() == mmd)
             {
-                LdapName myDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, op);
+                LdapName myDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm);
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     addDnReference(value, ownerAttributeName, myDN, emptyValue);
@@ -226,7 +226,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
     {
         if (value != null)
         {
-            LDAPUtils.unmarkForDeletion(op.getObject(), ec);
+            LDAPUtils.unmarkForDeletion(sm.getObject(), ec);
         }
 
         String ownerAttributeName = mappingMetaData.getOwnerAttributeName();
@@ -236,13 +236,13 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         if (mappingMetaData.getNonOwnerMMD() == mmd)
         {
             // other object is owner of the relation
-            LdapName myDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, op);
+            LdapName myDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm);
 
             if (value != null)
             {
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    Object oldValue = getDnMappedReference(effectiveClassMetaData, ownerAttributeName, op);
+                    Object oldValue = getDnMappedReference(effectiveClassMetaData, ownerAttributeName, sm);
                     if (!value.equals(oldValue))
                     {
                         LDAPUtils.markForPersisting(value, ec);
@@ -256,7 +256,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                     if (mmd.hasCollection())
                     {
                         Collection<Object> coll = (Collection<Object>) value;
-                        Collection<Object> oldColl = getDnMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, op);
+                        Collection<Object> oldColl = getDnMappedReferences(effectiveClassMetaData, mmd, ownerAttributeName, sm);
                         if (oldColl != null)
                         {
                             Collection<Object> toAdd = null;
@@ -292,7 +292,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         }
                         else
                         {
-                            throw new NucleusDataStoreException("No old collection in SM " + op);
+                            throw new NucleusDataStoreException("No old collection in SM " + sm);
                         }
                     }
                 }
@@ -303,7 +303,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
             }
             else
             {
-                removeDnReference(getDnMappedReference(effectiveClassMetaData, ownerAttributeName, op), ownerAttributeName, myDN, emptyValue);
+                removeDnReference(getDnMappedReference(effectiveClassMetaData, ownerAttributeName, sm), ownerAttributeName, myDN, emptyValue);
             }
         }
         else
@@ -329,7 +329,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                             Collection<Object> oldColl = null;
                             Class instanceType = mmd.getType();
                             instanceType = SCOUtils.getContainerInstanceType(instanceType, mmd.getOrderMetaData() != null);
-                            Collection<Object> attributeValues = LDAPUtils.getAttributeValuesFromLDAP(storeMgr, op, ownerAttributeName);
+                            Collection<Object> attributeValues = LDAPUtils.getAttributeValuesFromLDAP(storeMgr, sm, ownerAttributeName);
                             try
                             {
                                 oldColl = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();

@@ -41,15 +41,15 @@ public class MappingStrategyHelper
     /**
      * Finds the mapping strategy for the specified field of the state manager.
      * @param storeMgr Store Manager
-     * @param op state manager
+     * @param sm state manager
      * @param mmd Metadata for the member
      * @param attributes the JNDI attributes, either to store or the fetched ones
      * @return the mapping strategy, null if now appropriate mapping strategy exists
      */
-    public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, ObjectProvider op, AbstractMemberMetaData mmd, Attributes attributes)
+    public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         RelationType relType = mmd.getRelationType(clr);
         if (relType == RelationType.NONE)
         {
@@ -62,7 +62,7 @@ public class MappingStrategyHelper
             }
             else if (isCollection)
             {
-                type = op.getExecutionContext().getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
+                type = sm.getExecutionContext().getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
             }
 
             if (isBasicTypeSupported(type))
@@ -70,17 +70,17 @@ public class MappingStrategyHelper
                 if (isArray)
                 {
                     NucleusLogger.GENERAL.info(">> getMappingStrategy ARRAY " + mmd.getFullFieldName());
-                    return new SimpleArrayMappingStrategy(op, mmd, attributes);
+                    return new SimpleArrayMappingStrategy(sm, mmd, attributes);
                 }
                 else if (isCollection)
                 {
                     NucleusLogger.GENERAL.info(">> getMappingStrategy COLLECTION " + mmd.getFullFieldName());
-                    return new SimpleCollectionMappingStrategy(op, mmd, attributes);
+                    return new SimpleCollectionMappingStrategy(sm, mmd, attributes);
                 }
                 else
                 {
                     // TODO Remove this. Only Embedded basic fields need to come through here now
-                    return new SimpleMappingStrategy(op, mmd, attributes);
+                    return new SimpleMappingStrategy(sm, mmd, attributes);
                 }
             }
 
@@ -91,17 +91,17 @@ public class MappingStrategyHelper
                 if (isArray)
                 {
                     NucleusLogger.GENERAL.info(">> getMappingStrategy ARRAY " + mmd.getFullFieldName());
-                    return new SimpleArrayMappingStrategy(op, mmd, attributes);
+                    return new SimpleArrayMappingStrategy(sm, mmd, attributes);
                 }
                 else if (isCollection)
                 {
                     NucleusLogger.GENERAL.info(">> getMappingStrategy COLLECTION " + mmd.getFullFieldName());
-                    return new SimpleCollectionMappingStrategy(op, mmd, attributes);
+                    return new SimpleCollectionMappingStrategy(sm, mmd, attributes);
                 }
                 else
                 {
                     // TODO Remove this. Only Embedded basic fields need to come through here now
-                    return new SimpleMappingStrategy(op, mmd, attributes);
+                    return new SimpleMappingStrategy(sm, mmd, attributes);
                 }
             }
 
@@ -111,7 +111,7 @@ public class MappingStrategyHelper
         if (LDAPUtils.isEmbeddedField(mmd))
         {
             // TODO See MetaDataUtils.isMemberEmbedded for a better embedded field test
-            return new EmbeddedMappingStrategy(storeMgr, op, mmd, attributes);
+            return new EmbeddedMappingStrategy(storeMgr, sm, mmd, attributes);
         }
 
         if (mmd.hasExtension(LDAPStoreManager.MAPPING_STRATEGY_EXTENSON))
@@ -122,11 +122,11 @@ public class MappingStrategyHelper
             {
                 if (mappingStrategy.equalsIgnoreCase("dn"))
                 {
-                    return new RelationByDnStrategy(storeMgr, op, mmd, attributes);
+                    return new RelationByDnStrategy(storeMgr, sm, mmd, attributes);
                 }
                 else if (mappingStrategy.equalsIgnoreCase("attribute"))
                 {
-                    return new RelationByAttributeStrategy(storeMgr, op, mmd, attributes);
+                    return new RelationByAttributeStrategy(storeMgr, sm, mmd, attributes);
                 }
             }
         }
@@ -135,20 +135,20 @@ public class MappingStrategyHelper
         boolean isRelationByAttribute = RelationByAttributeMetaData.isRelationByAttribute(mmd, mmgr);
         if (isRelationByAttribute)
         {
-            return new RelationByAttributeStrategy(storeMgr, op, mmd, attributes);
+            return new RelationByAttributeStrategy(storeMgr, sm, mmd, attributes);
         }
 
         boolean isFieldHierarchicalMapped = RelationByHierarchyStrategy.isChildOfHierarchicalMapping(mmd, mmgr);
         boolean isFieldParentOfHierarchicalMapping = RelationByHierarchyStrategy.isParentOfHierarchicalMapping(mmd, mmgr);
         if (isFieldHierarchicalMapped || isFieldParentOfHierarchicalMapping)
         {
-            return new RelationByHierarchyStrategy(storeMgr, op, mmd, attributes);
+            return new RelationByHierarchyStrategy(storeMgr, sm, mmd, attributes);
         }
 
         boolean isRelationByDn = RelationByDnMetaData.isRelationByDn(mmd, mmgr);
         if (isRelationByDn)
         {
-            return new RelationByDnStrategy(storeMgr, op, mmd, attributes);
+            return new RelationByDnStrategy(storeMgr, sm, mmd, attributes);
         }
 
         return null;

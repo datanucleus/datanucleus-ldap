@@ -47,24 +47,24 @@ import org.datanucleus.store.types.converters.TypeConverter;
 public class FetchFieldManager extends AbstractFieldManager
 {
     ExecutionContext ec;
-    ObjectProvider op;
+    ObjectProvider sm;
     StoreManager storeMgr;
     Attributes result;
 
     // TODO Provide constructor that takes in ExecutionContext and AbstractClassMetaData so we can remove 
     // use of deprecated EC.findObjectUsingAID. This would mean that all XXXMappingStrategy take in ExecutionContext
-    public FetchFieldManager(StoreManager storeMgr, ObjectProvider op, Attributes result)
+    public FetchFieldManager(StoreManager storeMgr, ObjectProvider sm, Attributes result)
     {
-        this.ec = op.getExecutionContext();
-        this.op = op;
+        this.ec = sm.getExecutionContext();
+        this.sm = sm;
         this.storeMgr = storeMgr;
         this.result = result;
     }
 
     public Object fetchObjectField(int fieldNumber)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         Attribute attr = getAttributeForField(fieldNumber);
 
         RelationType relType = mmd.getRelationType(clr);
@@ -73,7 +73,7 @@ public class FetchFieldManager extends AbstractFieldManager
             if (mmd.hasCollection())
             {
                 Collection coll = SimpleContainerHelper.fetchCollection(mmd, attr, ec.getTypeManager(), clr);
-                return SCOUtils.wrapSCOField(op, fieldNumber, coll, true);
+                return SCOUtils.wrapSCOField(sm, fieldNumber, coll, true);
             }
             else if (mmd.hasArray())
             {
@@ -169,7 +169,7 @@ public class FetchFieldManager extends AbstractFieldManager
             }
         }
 
-        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, op, mmd, result);
+        AbstractMappingStrategy ms = MappingStrategyHelper.findMappingStrategy(storeMgr, sm, mmd, result);
         if (ms != null)
         {
             return ms.fetch();
@@ -181,7 +181,7 @@ public class FetchFieldManager extends AbstractFieldManager
 
     protected Attribute getAttributeForField(int fieldNumber)
     {
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         String name = LDAPUtils.getAttributeNameForField(mmd);
         return result.get(name);
     }
