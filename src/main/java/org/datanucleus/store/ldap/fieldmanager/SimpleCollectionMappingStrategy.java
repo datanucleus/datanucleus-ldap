@@ -31,13 +31,13 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.JoinMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 public class SimpleCollectionMappingStrategy extends SimpleArrayMappingStrategy
 {
-    public SimpleCollectionMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    public SimpleCollectionMappingStrategy(DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         type = sm.getExecutionContext().getClassLoaderResolver().classForName(mmd.getCollection().getElementType());

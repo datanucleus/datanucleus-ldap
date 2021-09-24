@@ -56,7 +56,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -166,10 +166,10 @@ public class LDAPUtils
     
     /**
      * Convenience method to check if the given object is mapped hierarchical.
-     * @param sm ObjectProvider
+     * @param sm StateManager
      * @return true if is hierarchical mapped
      */
-    public static boolean isHierarchicalMappedAtChild(ObjectProvider sm)
+    public static boolean isHierarchicalMappedAtChild(DNStateManager sm)
     {
         LocationInfo locationInfo = getLocationInfo(sm.getClassMetaData());
         return locationInfo.parentFieldName != null;
@@ -192,7 +192,7 @@ public class LDAPUtils
      * @param sm StateManager
      * @return the RDN for object
      */
-    private static Rdn getRdnForObject(StoreManager storeMgr, ObjectProvider sm) throws InvalidNameException
+    private static Rdn getRdnForObject(StoreManager storeMgr, DNStateManager sm) throws InvalidNameException
     {
         AbstractClassMetaData cmd = sm.getClassMetaData();
         // TODO Cater for composite PK
@@ -216,7 +216,7 @@ public class LDAPUtils
      * @param sm StateManager
      * @return Distinguished name
      */
-    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider sm)
+    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, DNStateManager sm)
     {
         return getDistinguishedNameForObject(storeMgr, sm, false);
     }
@@ -229,17 +229,17 @@ public class LDAPUtils
      * @param forceFetchHierarchicalMappedDn true to fetch the name from directory server
      * @return Distinguished name
      */
-    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider sm, boolean forceFetchHierarchicalMappedDn)
+    public static LdapName getDistinguishedNameForObject(StoreManager storeMgr, DNStateManager sm, boolean forceFetchHierarchicalMappedDn)
     {
         return getDistinguishedNameForObject(storeMgr, sm, null, forceFetchHierarchicalMappedDn);
     }
 
-    private static LdapName getDistinguishedNameForObject(StoreManager storeMgr, ObjectProvider sm, Set<ObjectProvider> handledOPs,
+    private static LdapName getDistinguishedNameForObject(StoreManager storeMgr, DNStateManager sm, Set<DNStateManager> handledOPs,
             boolean forceFetchHierarchicalMappedDn)
     {
         if (handledOPs == null)
         {
-            handledOPs = new HashSet<ObjectProvider>();
+            handledOPs = new HashSet<DNStateManager>();
         }
         if (handledOPs.contains(sm))
         {
@@ -255,10 +255,10 @@ public class LDAPUtils
         try
         {
             SearchControls searchControls = getSearchControls(cmd);
-            ObjectProvider[] embOwnerSMs = ec.getOwnersForEmbeddedObjectProvider(sm);
+            DNStateManager[] embOwnerSMs = ec.getOwnersForEmbeddedStateManager(sm);
             if (embOwnerSMs != null && embOwnerSMs.length > 0)
             {
-                ObjectProvider embOwnerSM = embOwnerSMs[0];
+                DNStateManager embOwnerSM = embOwnerSMs[0];
                 dn = getDistinguishedNameForObject(storeMgr, embOwnerSM, handledOPs, forceFetchHierarchicalMappedDn);
                 dn.add(getRdnForObject(storeMgr, sm));
             }
@@ -324,7 +324,7 @@ public class LDAPUtils
                     {
                         // compose DN using parent DN
                         boolean detached = ec.getApiAdapter().isDetached(parentFieldValue);
-                        ObjectProvider parentSm = ec.findObjectProvider(parentFieldValue, detached);
+                        DNStateManager parentSm = ec.findStateManager(parentFieldValue, detached);
                         if (parentSm == null)
                         {
                             throw new NucleusObjectNotFoundException("No state manager found for object " + parentFieldValue);
@@ -631,7 +631,7 @@ public class LDAPUtils
      * @param attributeName the attribute name
      * @return the attribute value
      */
-    public static Object getAttributeValue(StoreManager storeMgr, ObjectProvider sm, String attributeName)
+    public static Object getAttributeValue(StoreManager storeMgr, DNStateManager sm, String attributeName)
     {
         try
         {
@@ -662,7 +662,7 @@ public class LDAPUtils
      * @param attributeName the attribute name
      * @return the attribute value
      */
-    public static Collection<Object> getAttributeValuesFromLDAP(StoreManager storeMgr, ObjectProvider sm, String attributeName)
+    public static Collection<Object> getAttributeValuesFromLDAP(StoreManager storeMgr, DNStateManager sm, String attributeName)
     {
         ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
         try
@@ -992,11 +992,11 @@ public class LDAPUtils
         for (final Attributes attrs : entries.values())
         {
             // TODO Drop usage of findObjectUsingAID (see NUCLDAP-48) and use IdentityUtils instead
-            // The problem is that FetchFieldManager relies on having ObjectProvider available, which is wrong
+            // The problem is that FetchFieldManager relies on having StateManager available, which is wrong
             Object pc = findObjectUsingAID(ec, clr.classForName(cmd.getFullClassName()), new FieldValues()
             {
-                // ObjectProvider calls the fetchFields method
-                public void fetchFields(ObjectProvider sm)
+                // StateManager calls the fetchFields method
+                public void fetchFields(DNStateManager sm)
                 {
                     sm.replaceFields(cmd.getPKMemberPositions(), new FetchFieldManager(storeMgr, sm, attrs));
                     
@@ -1019,7 +1019,7 @@ public class LDAPUtils
                     sm.replaceFields(basicMemberPosition, new FetchFieldManager(storeMgr, sm, attrs));
                 }
 
-                public void fetchNonLoadedFields(ObjectProvider sm)
+                public void fetchNonLoadedFields(DNStateManager sm)
                 {
                     sm.replaceNonLoadedFields(cmd.getAllMemberPositions(), new FetchFieldManager(storeMgr, sm, attrs));
                 }
@@ -1051,8 +1051,8 @@ public class LDAPUtils
      */
     protected static Object findObjectUsingAID(ExecutionContext ec, Class pcCls, final FieldValues fv, boolean ignoreCache, boolean checkInheritance)
     {
-        // Create ObjectProvider to generate an identity NOTE THIS IS VERY INEFFICIENT
-        ObjectProvider sm = ec.getNucleusContext().getObjectProviderFactory().newForHollowPopulatedAppId(ec, pcCls, fv);
+        // Create StateManager to generate an identity NOTE THIS IS VERY INEFFICIENT
+        DNStateManager sm = ec.getNucleusContext().getStateManagerFactory().newForHollowPopulatedAppId(ec, pcCls, fv);
         if (!ignoreCache)
         {
             // Check the cache
@@ -1060,7 +1060,7 @@ public class LDAPUtils
             Object pc = ec.getObjectFromCache(oid);
             if (pc != null)
             {
-                sm = ec.findObjectProvider(pc);
+                sm = ec.findStateManager(pc);
                 // Note that this can cause problems like NUCRDBMS-402 due to attempt to re-read the field values
                 sm.loadFieldValues(fv); // Load the values retrieved by the query
                 return pc;
@@ -1087,7 +1087,7 @@ public class LDAPUtils
                             pc = ec.getObjectFromCache(oid);
                             if (pc != null)
                             {
-                                sm = ec.findObjectProvider(pc);
+                                sm = ec.findStateManager(pc);
                                 sm.loadFieldValues(fv); // Load the values retrieved by the query
                                 return pc;
                             }
@@ -1099,7 +1099,7 @@ public class LDAPUtils
 
         if (checkInheritance)
         {
-            // TODO Remove this reference to ObjectProvider (should be ObjectProvider only)
+            // TODO Remove this reference to StateManager (should be StateManager only)
             sm.checkInheritance(fv); // Find the correct PC class for this object, hence updating the object id
             if (!ignoreCache)
             {
@@ -1109,7 +1109,7 @@ public class LDAPUtils
                 if (pc != null)
                 {
                     // We have an object with this new object id already so return it with the retrieved field values imposed
-                    sm = ec.findObjectProvider(pc);
+                    sm = ec.findStateManager(pc);
                     sm.loadFieldValues(fv); // Load the values retrieved by the query
                     return pc;
                 }

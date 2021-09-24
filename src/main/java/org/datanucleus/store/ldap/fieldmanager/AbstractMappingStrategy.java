@@ -24,19 +24,19 @@ import javax.naming.directory.Attributes;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 
 /**
  * Basic class for all mapping strategies. A mapping strategy is used to map values to LDAP attributes and entries.
- * TODO Remove ObjectProvider from this since it is currently creating one of these per field per object!!
+ * TODO Remove StateManager from this since it is currently creating one of these per field per object!!
  */
 public abstract class AbstractMappingStrategy
 {
     protected ExecutionContext ec;
 
-    /** ObjectProvider. */
-    protected ObjectProvider sm;
+    /** StateManager. */
+    protected DNStateManager sm;
 
     /** The JNDI attributes. */
     protected Attributes attributes;
@@ -59,7 +59,7 @@ public abstract class AbstractMappingStrategy
      * @param mmd Metadata for the member
      * @param attributes the attributes
      */
-    protected AbstractMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    protected AbstractMappingStrategy(DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         this.ec = sm.getExecutionContext();
         this.sm = sm;

@@ -43,7 +43,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.types.SCOUtils;
@@ -64,7 +64,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     protected ClassLoaderResolver clr;
 
-    protected EmbeddedMappingStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    protected EmbeddedMappingStrategy(StoreManager storeMgr, DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
@@ -117,9 +117,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
 
         // TODO Provide the owner in this call
-        ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
+        DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
         // TODO Why get SM just after creating it????
-        embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
+        embeddedSM = getEmbeddedStateManager(embeddedSM.getObject());
 
         return fetchMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
     }
@@ -172,9 +172,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         for (Attributes embeddedAttrs : entries.values())
         {
             // TODO Populate the owner object in this call
-            ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
+            DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             // TODO Why get SM just after creating it????
-            embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
+            embeddedSM = getEmbeddedStateManager(embeddedSM.getObject());
             Object value = fetchMerge(embeddedSM, embeddedAttrs, embeddedMmds, embeddedMetaData);
             if (value != null)
             {
@@ -194,9 +194,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 for (Attributes embeddedAttrs : entries.values())
                 {
                     // TODO Pass in owner to this call
-                    ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, cmd, null, -1);
+                    DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, cmd, null, -1);
                     // TODO Why get SM just after creating it????
-                    embeddedSM = getEmbeddedObjectProvider(embeddedSM.getObject());
+                    embeddedSM = getEmbeddedStateManager(embeddedSM.getObject());
                     Object value = fetchMerge(embeddedSM, embeddedAttrs, embeddedMmds, embeddedMetaData);
                     if (value != null)
                     {
@@ -209,7 +209,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         return coll;
     }
 
-    private Object fetchMerge(ObjectProvider embeddedSM, Attributes embeddedAttrs, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData)
+    private Object fetchMerge(DNStateManager embeddedSM, Attributes embeddedAttrs, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData)
     {
         if (embeddedAttrs != null && embeddedMmds != null)
         {
@@ -289,9 +289,9 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         }
     }
 
-    private ObjectProvider getEmbeddedObjectProvider(Object value)
+    private DNStateManager getEmbeddedStateManager(Object value)
     {
-        return ec.findObjectProviderForEmbedded(value, sm, mmd);
+        return ec.findStateManagerForEmbedded(value, sm, mmd);
     }
 
     @Override
@@ -341,7 +341,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     private void insertEmbedded(Object value)
     {
-        ObjectProvider embeddedSM = getEmbeddedObjectProvider(value);
+        DNStateManager embeddedSM = getEmbeddedStateManager(value);
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
         List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
         insertMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
@@ -350,7 +350,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     private void insertAsChild(Object value, EmbeddedMetaData embeddedMetaData)
     {
         // merge fields
-        ObjectProvider embeddedSM = getEmbeddedObjectProvider(value);
+        DNStateManager embeddedSM = getEmbeddedStateManager(value);
         effectiveClassMetaData = embeddedSM.getClassMetaData();
         List<AbstractMemberMetaData> embeddedMmds = LDAPUtils.getAllMemberMetaData(effectiveClassMetaData);
         BasicAttributes embeddedAttributes = new BasicAttributes();
@@ -387,7 +387,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         insertMerge(embeddedSM, embeddedAttributes, embeddedMmds, embeddedMetaData);
     }
 
-    private void insertMerge(ObjectProvider embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData)
+    private void insertMerge(DNStateManager embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData)
     {
         AbstractClassMetaData embeddedCmd = embeddedSM.getClassMetaData();
 
@@ -462,8 +462,8 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                     }
                     else
                     {
-                        ObjectProvider valueSM = getEmbeddedObjectProvider(value);
-                        ObjectProvider oldValueSM = getEmbeddedObjectProvider(oldValue);
+                        DNStateManager valueSM = getEmbeddedStateManager(value);
+                        DNStateManager oldValueSM = getEmbeddedStateManager(oldValue);
                         LdapName valueDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, valueSM);
                         LdapName oldValueDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, oldValueSM);
                         if (!valueDn.equals(oldValueDn))
@@ -490,7 +490,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 LinkedHashMap<LdapName, Object> newMap = new LinkedHashMap<LdapName, Object>();
                 for (Object newObject : coll)
                 {
-                    ObjectProvider newObjectSM = getEmbeddedObjectProvider(newObject);
+                    DNStateManager newObjectSM = getEmbeddedStateManager(newObject);
                     LdapName newObjectDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, newObjectSM);
                     newMap.put(newObjectDn, newObject);
                 }
@@ -501,7 +501,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
                 LinkedHashMap<LdapName, Object> oldMap = new LinkedHashMap<LdapName, Object>();
                 for (Object oldObject : oldColl)
                 {
-                    ObjectProvider oldObjectSM = getEmbeddedObjectProvider(oldObject);
+                    DNStateManager oldObjectSM = getEmbeddedStateManager(oldObject);
                     LdapName oldObjectDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, oldObjectSM);
                     oldMap.put(oldObjectDn, oldObject);
                 }
@@ -562,11 +562,11 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     private void updateAsChild(Object value, EmbeddedMetaData embeddedMetaData)
     {
         // update
-        ObjectProvider embeddedSM = ec.findObjectProvider(value);
+        DNStateManager embeddedSM = ec.findStateManager(value);
         boolean insert = false;
         if (embeddedSM == null)
         {
-            embeddedSM = getEmbeddedObjectProvider(value);
+            embeddedSM = getEmbeddedStateManager(value);
             insert = true;
         }
 
@@ -602,7 +602,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
     private void deleteAsChild(Object oldValue, EmbeddedMetaData embeddedMetaData)
     {
-        ObjectProvider embeddedSM = getEmbeddedObjectProvider(oldValue);
+        DNStateManager embeddedSM = getEmbeddedStateManager(oldValue);
         LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, embeddedSM);
         LDAPUtils.deleteRecursive(storeMgr, dn, ec);
     }
@@ -613,7 +613,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         {
             // create an instance with empty fields, this will null-out all embedded fields
             // TODO Populate the owner object in this call
-            ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
+            DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             int[] allMemberPositions = embeddedSM.getClassMetaData().getAllMemberPositions();
             for (int i : allMemberPositions)
             {
@@ -623,11 +623,11 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
             value = embeddedSM.getObject();
         }
 
-        ObjectProvider embeddedSM = ec.findObjectProvider(value);
+        DNStateManager embeddedSM = ec.findStateManager(value);
         boolean insert = false;
         if (embeddedSM == null)
         {
-            embeddedSM = getEmbeddedObjectProvider(value);
+            embeddedSM = getEmbeddedStateManager(value);
             insert = true;
         }
 
@@ -636,7 +636,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         updateMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData, insert);
     }
 
-    private void updateMerge(ObjectProvider embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData, boolean insert)
+    private void updateMerge(DNStateManager embeddedSM, Attributes embeddedAttributes, List<AbstractMemberMetaData> embeddedMmds, EmbeddedMetaData embeddedMetaData, boolean insert)
     {
         AbstractClassMetaData embeddedCmd = embeddedSM.getClassMetaData();
 
@@ -705,7 +705,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         {
             List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
             // TODO Populate the owner object in this call
-            ObjectProvider embeddedSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
+            DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
             {
                 // TODO If no mapping strategy then use FetchFieldManager (embedded)

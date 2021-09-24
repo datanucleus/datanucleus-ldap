@@ -52,7 +52,7 @@ import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.AbstractPersistenceHandler;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -90,11 +90,11 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     }
 
     /**
-     * Insert the object managed by the passed ObjectProvider into the LDAP datastore.
+     * Insert the object managed by the passed StateManager into the LDAP datastore.
      * @param sm StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void insertObject(final ObjectProvider sm)
+    public void insertObject(final DNStateManager sm)
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(sm);
@@ -110,7 +110,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
             if (parentFieldValue != null)
             {
                 // compose DN using parent DN
-                sm.getExecutionContext().findObjectProvider(parentFieldValue, true);
+                sm.getExecutionContext().findStateManager(parentFieldValue, true);
             }
             else if (locationInfo.dn == null)
             {
@@ -232,12 +232,12 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     }
 
     /**
-     * Updates the specified fields of the object managed by the passed ObjectProvider in the LDAP datastore.
+     * Updates the specified fields of the object managed by the passed StateManager in the LDAP datastore.
      * @param sm StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      * @throws NucleusOptimisticException thrown if version checking fails
      */
-    public void updateObject(final ObjectProvider sm, int[] fieldNumbers)
+    public void updateObject(final DNStateManager sm, int[] fieldNumbers)
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(sm);
@@ -338,12 +338,12 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     }
 
     /**
-     * Deletes the object managed by the passed ObjectProvider from the LDAP datastore.
+     * Deletes the object managed by the passed StateManager from the LDAP datastore.
      * @param sm StateManager
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      * @throws NucleusOptimisticException thrown if version checking fails on an optimistic transaction for this object
      */
-    public void deleteObject(ObjectProvider sm)
+    public void deleteObject(DNStateManager sm)
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(sm);
@@ -424,7 +424,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * Deletes DN references to the given state manager
      * @param sm StateManager
      */
-    private void deleteDnReferences(ObjectProvider sm)
+    private void deleteDnReferences(DNStateManager sm)
     {
         // 1st) this sm itself has a DN reference with <element>
         int[] fieldNumbers = sm.getClassMetaData().getAllMemberPositions();
@@ -494,7 +494,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager
      * @param emptyValue the value used for an empty member attribute
      */
-    private void deleteDnReference(AbstractClassMetaData cmd, String name, ObjectProvider sm, Object emptyValue)
+    private void deleteDnReference(AbstractClassMetaData cmd, String name, DNStateManager sm, Object emptyValue)
     {
         // System.out.println("deleteDnReference: " + cmd.getName() + " - " + sm);
         LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
@@ -552,10 +552,10 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     }
 
     /**
-     * Deletes attribute references to the given ObjectProvider
+     * Deletes attribute references to the given StateManager
      * @param sm StateManager
      */
-    private void deleteAttributeReferences(ObjectProvider sm)
+    private void deleteAttributeReferences(DNStateManager sm)
     {
         // 1st) this sm itself has a attribute reference with <element>
         int[] fieldNumbers = sm.getClassMetaData().getAllMemberPositions();
@@ -632,7 +632,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager
      * @param emptyValue the value used for an empty member attribute
      */
-    private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue, ObjectProvider sm, Object emptyValue)
+    private void deleteAttributeReference(AbstractClassMetaData cmd, String attributeName, Object attributeValue, DNStateManager sm, Object emptyValue)
     {
         // search for object with (pcAttributeName=myDN)
         ExecutionContext om = sm.getExecutionContext();
@@ -692,7 +692,7 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
      * @param fieldNumbers Absolute field numbers to retrieve
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void fetchObject(final ObjectProvider sm, int[] fieldNumbers)
+    public void fetchObject(final DNStateManager sm, int[] fieldNumbers)
     {
         if (sm.getLifecycleState().isDeleted())
         {
@@ -799,11 +799,11 @@ public class LDAPPersistenceHandler extends AbstractPersistenceHandler
     }
 
     /**
-     * Locates the object managed by the passed ObjectProvider into the LDAP datastore.
+     * Locates the object managed by the passed StateManager into the LDAP datastore.
      * @param sm StateManager
      * @throws NucleusObjectNotFoundException if the object cannot be located
      */
-    public void locateObject(ObjectProvider sm)
+    public void locateObject(DNStateManager sm)
     {
         final AbstractClassMetaData cmd = sm.getClassMetaData();
         if (cmd.getIdentityType() == IdentityType.APPLICATION)

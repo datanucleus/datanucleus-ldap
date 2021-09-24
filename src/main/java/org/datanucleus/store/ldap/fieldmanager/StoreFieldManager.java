@@ -31,7 +31,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.ldap.LDAPUtils;
@@ -42,12 +42,12 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class StoreFieldManager extends AbstractFieldManager
 {
-    ObjectProvider sm;
+    DNStateManager sm;
     StoreManager storeMgr;
     Attributes attributes;
     boolean insert;
 
-    public StoreFieldManager(StoreManager storeMgr, ObjectProvider sm, Attributes attrs, boolean insert)
+    public StoreFieldManager(StoreManager storeMgr, DNStateManager sm, Attributes attrs, boolean insert)
     {
         this.sm = sm;
         this.storeMgr = storeMgr;

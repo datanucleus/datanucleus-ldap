@@ -34,7 +34,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.ldap.LDAPUtils;
@@ -47,13 +47,13 @@ import org.datanucleus.store.types.converters.TypeConverter;
 public class FetchFieldManager extends AbstractFieldManager
 {
     ExecutionContext ec;
-    ObjectProvider sm;
+    DNStateManager sm;
     StoreManager storeMgr;
     Attributes result;
 
     // TODO Provide constructor that takes in ExecutionContext and AbstractClassMetaData so we can remove 
     // use of deprecated EC.findObjectUsingAID. This would mean that all XXXMappingStrategy take in ExecutionContext
-    public FetchFieldManager(StoreManager storeMgr, ObjectProvider sm, Attributes result)
+    public FetchFieldManager(StoreManager storeMgr, DNStateManager sm, Attributes result)
     {
         this.ec = sm.getExecutionContext();
         this.sm = sm;

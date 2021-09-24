@@ -33,7 +33,7 @@ import javax.naming.directory.BasicAttribute;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.store.types.converters.TypeConverter;
 
@@ -43,7 +43,7 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class SimpleArrayMappingStrategy extends AbstractMappingStrategy
 {
-    public SimpleArrayMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    public SimpleArrayMappingStrategy(DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         type = type.getComponentType();

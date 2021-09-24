@@ -26,7 +26,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPStoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
@@ -46,7 +46,7 @@ public class MappingStrategyHelper
      * @param attributes the JNDI attributes, either to store or the fetched ones
      * @return the mapping strategy, null if now appropriate mapping strategy exists
      */
-    public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    public static AbstractMappingStrategy findMappingStrategy(StoreManager storeMgr, DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();

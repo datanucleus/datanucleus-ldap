@@ -34,7 +34,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.ldap.LDAPUtils.LocationInfo;
 import org.datanucleus.store.types.SCOUtils;
@@ -59,7 +59,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
 
     protected boolean isFieldParentOfHierarchicalMapping;
 
-    protected RelationByHierarchyStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    protected RelationByHierarchyStrategy(StoreManager storeMgr, DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
@@ -110,7 +110,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         throw new NucleusException("Cant obtain value for field " + mmd.getFullFieldName() + " since type=" + mmd.getTypeName() + " is not supported for this datastore");
     }
 
-    private Object getHierarchicalMappedChild(AbstractMemberMetaData mmd, ObjectProvider sm)
+    private Object getHierarchicalMappedChild(AbstractMemberMetaData mmd, DNStateManager sm)
     {
         Collection<Object> coll = getHierarchicalMappedChildren(mmd.getTypeName(), mmd.getMappedBy(), null, sm);
         if (coll.iterator().hasNext())
@@ -121,7 +121,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
         return null;
     }
 
-    private Collection<Object> getHierarchicalMappedChildren(String type, String mappedBy, AbstractMemberMetaData mmd, ObjectProvider sm)
+    private Collection<Object> getHierarchicalMappedChildren(String type, String mappedBy, AbstractMemberMetaData mmd, DNStateManager sm)
     {
         Collection<Object> coll;
 
@@ -218,7 +218,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                     Object oldValue = getHierarchicalMappedChild(mmd, sm);
                     if (oldValue != null)
                     {
-                        ObjectProvider oldValueSM = ec.findObjectProvider(oldValue, false);
+                        DNStateManager oldValueSM = ec.findStateManager(oldValue, false);
                         if (mustDelete(oldValueSM))
                         {
                             // delete only if the old value is still a child of this state manager
@@ -227,7 +227,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                     }
 
                     // if new value.sm != null
-                    ObjectProvider valueSM = ec.findObjectProvider(value, false);
+                    DNStateManager valueSM = ec.findStateManager(value, false);
                     if (valueSM != null)
                     {
                         LdapName oldDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, valueSM, true);
@@ -279,7 +279,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                             toRemove.removeAll(coll);
                             for (Object pc : toRemove)
                             {
-                                ObjectProvider pcSM = ec.findObjectProvider(pc, false);
+                                DNStateManager pcSM = ec.findStateManager(pc, false);
                                 if (mustDelete(pcSM))
                                 {
                                     // delete only if the old value is still a child of this state manager
@@ -293,7 +293,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
                             toRemove.removeAll(coll);
                             for (Object pc : toRemove)
                             {
-                                ObjectProvider pcSM = ec.findObjectProvider(pc, false);
+                                DNStateManager pcSM = ec.findStateManager(pc, false);
                                 if (mustDelete(pcSM, mappedBy))
                                 {
                                     // System.out.println("deleteMap.put(5): " + pc);
@@ -324,7 +324,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
      * @param pcSM the PC state manager
      * @return true if must delete
      */
-    private boolean mustDelete(ObjectProvider pcSM)
+    private boolean mustDelete(DNStateManager pcSM)
     {
         LdapName dn = LDAPUtils.getDistinguishedNameForObject(storeMgr, sm, true);
         LdapName pcDn = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM, true);
@@ -337,7 +337,7 @@ public class RelationByHierarchyStrategy extends AbstractMappingStrategy
      * @param mappedBy the mapped by field name
      * @return true if must delete
      */
-    private boolean mustDelete(ObjectProvider pcSM, String mappedBy)
+    private boolean mustDelete(DNStateManager pcSM, String mappedBy)
     {
         try
         {

@@ -36,7 +36,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.ldap.LDAPUtils;
@@ -59,7 +59,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
 
     protected RelationByAttributeMetaData mappingMetaData;
 
-    protected RelationByAttributeStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    protected RelationByAttributeStrategy(StoreManager storeMgr, DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
@@ -192,8 +192,8 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 // current object is owner of the relation
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    ObjectProvider pcOP = ec.findObjectProvider(value, true);
-                    Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, pcOP, joinAttributeName);
+                    DNStateManager pcSM = ec.findStateManager(value, true);
+                    Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, pcSM, joinAttributeName);
                     BasicAttribute attr = new BasicAttribute(ownerAttributeName, joinAttributeValue);
                     addEmptyValue(emptyValue, attr);
                     attributes.put(attr);
@@ -207,7 +207,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         BasicAttribute attr = new BasicAttribute(ownerAttributeName);
                         for (Object pc : c)
                         {
-                            ObjectProvider pcSM = ec.findObjectProvider(pc, true);
+                            DNStateManager pcSM = ec.findStateManager(pc, true);
                             Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, pcSM, joinAttributeName);
                             attr.add(joinAttributeValue);
                         }
@@ -254,7 +254,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         LDAPUtils.markForPersisting(value, ec);
                         LDAPUtils.unmarkForDeletion(value, ec);
                         removeAttributeReference(oldValue, ownerAttributeName, joinAttributeValue, emptyValue);
-                        ObjectProvider valueOP = ec.findObjectProvider(value);
+                        DNStateManager valueOP = ec.findStateManager(value);
                         if (valueOP != null && valueOP.isWaitingToBeFlushedToDatastore())
                         {
                             // New value is not yet persistent, so flush it so we can set its attribute
@@ -304,7 +304,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         }
                         else
                         {
-                            throw new NucleusDataStoreException("No old collection in ObjectProvider " + sm);
+                            throw new NucleusDataStoreException("No old collection in StateManager " + sm);
                         }
                     }
                 }
@@ -328,7 +328,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                 {
                     // TODO: check empty value
                     // TODO: delete dependent
-                    ObjectProvider smpc = ec.findObjectProvider(value, true);
+                    DNStateManager smpc = ec.findStateManager(value, true);
                     LDAPUtils.unmarkForDeletion(value, ec);
                     Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, smpc, joinAttributeName);
                     attributes.put(new BasicAttribute(ownerAttributeName, joinAttributeValue));
@@ -385,7 +385,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
                         for (Object pc : coll)
                         {
                             LDAPUtils.unmarkForDeletion(pc, ec);
-                            ObjectProvider smpc = ec.findObjectProvider(pc, true);
+                            DNStateManager smpc = ec.findStateManager(pc, true);
                             Object joinAttributeValue = LDAPUtils.getAttributeValue(storeMgr, smpc, joinAttributeName);
                             attr.add(joinAttributeValue);
                         }
@@ -457,7 +457,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         if (fromObject != null)
         {
             // delete reference from old object
-            ObjectProvider fromOP = ec.findObjectProvider(fromObject, true);
+            DNStateManager fromOP = ec.findStateManager(fromObject, true);
             LdapName fromDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, fromOP);
 
             if (fromOP.getExecutionContext().getApiAdapter().isDeleted(fromObject))
@@ -503,7 +503,7 @@ public class RelationByAttributeStrategy extends AbstractMappingStrategy
         if (toObject != null)
         {
             // add reference to new object
-            ObjectProvider toOP = ec.findObjectProvider(toObject, true);
+            DNStateManager toOP = ec.findStateManager(toObject, true);
             LdapName toDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, toOP);
 
             if (toOP.isInserting())

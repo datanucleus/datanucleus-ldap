@@ -39,7 +39,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.ldap.LDAPUtils;
@@ -62,7 +62,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
 
     protected RelationByDnMetaData mappingMetaData;
 
-    protected RelationByDnStrategy(StoreManager storeMgr, ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    protected RelationByDnStrategy(StoreManager storeMgr, DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
         this.fieldNumber = mmd.getAbsoluteFieldNumber();
@@ -188,7 +188,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 // current object is owner of the relation
                 if (RelationType.isRelationSingleValued(relationType))
                 {
-                    ObjectProvider pcSM = ec.findObjectProvider(value, true);
+                    DNStateManager pcSM = ec.findStateManager(value, true);
                     LdapName pcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM);
                     // attributes.put(new BasicAttribute(name, pcDN.toString()));
                     BasicAttribute attr = new BasicAttribute(ownerAttributeName, pcDN.toString());
@@ -204,7 +204,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         BasicAttribute attr = new BasicAttribute(name);
                         for (Object pc : c)
                         {
-                            ObjectProvider pcSM = ec.findObjectProvider(pc, true);
+                            DNStateManager pcSM = ec.findStateManager(pc, true);
                             attr.add(LDAPUtils.getDistinguishedNameForObject(storeMgr, pcSM).toString());
                         }
                         addEmptyValue(emptyValue, attr);
@@ -314,7 +314,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                 if (RelationType.isRelationSingleValued(relationType))
                 {
                     // TODO: check empty value
-                    ObjectProvider smpc = ec.findObjectProvider(value, true);
+                    DNStateManager smpc = ec.findStateManager(value, true);
                     LDAPUtils.unmarkForDeletion(value, ec);
                     attributes.put(new BasicAttribute(ownerAttributeName, LDAPUtils.getDistinguishedNameForObject(storeMgr, smpc).toString()));
                 }
@@ -361,7 +361,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
                         for (Object pc : coll)
                         {
                             LDAPUtils.unmarkForDeletion(pc, ec);
-                            ObjectProvider smpc = ec.findObjectProvider(pc, true);
+                            DNStateManager smpc = ec.findStateManager(pc, true);
                             attr.add(LDAPUtils.getDistinguishedNameForObject(storeMgr, smpc).toString());
                         }
                         addEmptyValue(emptyValue, attr);
@@ -382,7 +382,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         }
     }
 
-    private Object getDnMappedReference(AbstractClassMetaData cmd, String pcAttributeName, ObjectProvider sm)
+    private Object getDnMappedReference(AbstractClassMetaData cmd, String pcAttributeName, DNStateManager sm)
     {
         Collection<Object> coll = getDnMappedReferences(cmd, null, pcAttributeName, sm);
         if (coll.iterator().hasNext())
@@ -395,7 +395,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         return null;
     }
 
-    private Collection<Object> getDnMappedReferences(AbstractClassMetaData cmd, AbstractMemberMetaData mmd, String pcAttributeName, ObjectProvider sm)
+    private Collection<Object> getDnMappedReferences(AbstractClassMetaData cmd, AbstractMemberMetaData mmd, String pcAttributeName, DNStateManager sm)
     {
         Collection<Object> coll;
 
@@ -434,7 +434,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         if (oldObject != null)
         {
             // delete reference from old object
-            ObjectProvider oldPcSM = ec.findObjectProvider(oldObject, true);
+            DNStateManager oldPcSM = ec.findStateManager(oldObject, true);
             LdapName oldPcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, oldPcSM);
 
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -474,7 +474,7 @@ public class RelationByDnStrategy extends AbstractMappingStrategy
         if (newObject != null)
         {
             // add reference to new object
-            ObjectProvider newPcSM = ec.findObjectProvider(newObject, true);
+            DNStateManager newPcSM = ec.findStateManager(newObject, true);
             LdapName newPcDN = LDAPUtils.getDistinguishedNameForObject(storeMgr, newPcSM);
 
             if (newPcSM.isInserting())

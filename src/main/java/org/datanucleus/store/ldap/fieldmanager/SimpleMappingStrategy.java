@@ -32,7 +32,7 @@ import javax.naming.directory.BasicAttribute;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
@@ -41,7 +41,7 @@ import org.datanucleus.store.types.converters.TypeConverter;
  */
 public class SimpleMappingStrategy extends AbstractMappingStrategy
 {
-    public SimpleMappingStrategy(ObjectProvider sm, AbstractMemberMetaData mmd, Attributes attributes)
+    public SimpleMappingStrategy(DNStateManager sm, AbstractMemberMetaData mmd, Attributes attributes)
     {
         super(sm, mmd, attributes);
     }
