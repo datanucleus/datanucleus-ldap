@@ -114,7 +114,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
 
         // use field meta data from embedded meta data
-        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
+        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(embeddedMetaData.getMemberMetaData());
 
         // TODO Provide the owner in this call
         DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
@@ -343,7 +343,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
     {
         DNStateManager embeddedSM = getEmbeddedStateManager(value);
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
-        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
+        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(embeddedMetaData.getMemberMetaData());
         insertMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData);
     }
 
@@ -632,7 +632,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
         }
 
         EmbeddedMetaData embeddedMetaData = mmd.getEmbeddedMetaData();
-        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
+        List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(embeddedMetaData.getMemberMetaData());
         updateMerge(embeddedSM, attributes, embeddedMmds, embeddedMetaData, insert);
     }
 
@@ -703,7 +703,7 @@ public class EmbeddedMappingStrategy extends AbstractMappingStrategy
 
         if (embeddedMetaData != null)
         {
-            List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(Arrays.asList(embeddedMetaData.getMemberMetaData()));
+            List<AbstractMemberMetaData> embeddedMmds = new ArrayList<AbstractMemberMetaData>(embeddedMetaData.getMemberMetaData());
             // TODO Populate the owner object in this call
             DNStateManager embeddedSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, effectiveClassMetaData, null, -1);
             for (AbstractMemberMetaData embeddedMmd : embeddedMmds)
