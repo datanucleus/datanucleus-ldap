@@ -255,10 +255,9 @@ public class LDAPUtils
         try
         {
             SearchControls searchControls = getSearchControls(cmd);
-            DNStateManager[] embOwnerSMs = ec.getOwnersForEmbeddedStateManager(sm);
-            if (embOwnerSMs != null && embOwnerSMs.length > 0)
+            DNStateManager embOwnerSM = ec.getOwnerForEmbeddedStateManager(sm);
+            if (embOwnerSM != null)
             {
-                DNStateManager embOwnerSM = embOwnerSMs[0];
                 dn = getDistinguishedNameForObject(storeMgr, embOwnerSM, handledOPs, forceFetchHierarchicalMappedDn);
                 dn.add(getRdnForObject(storeMgr, sm));
             }
