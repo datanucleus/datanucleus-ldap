@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.query.AbstractJDOQLQuery;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.inmemory.JDOQLInMemoryEvaluator;
 import org.datanucleus.store.query.inmemory.JavaQueryInMemoryEvaluator;
 import org.datanucleus.util.Localiser;
@@ -90,7 +90,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
             startTime = System.currentTimeMillis();
-            NucleusLogger.QUERY.debug(Localiser.msg("021046", Query.LANGUAGE_JDOQL, getSingleStringQuery(), null));
+            NucleusLogger.QUERY.debug(Localiser.msg("021046", QueryLanguage.JDOQL.name(), getSingleStringQuery(), null));
         }
         Collection candidates = null;
         if (candidateCollection == null)
@@ -110,7 +110,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(Localiser.msg("021074", Query.LANGUAGE_JDOQL, "" + (System.currentTimeMillis() - startTime)));
+            NucleusLogger.QUERY.debug(Localiser.msg("021074", QueryLanguage.JDOQL.name(), "" + (System.currentTimeMillis() - startTime)));
         }
 
         return results;

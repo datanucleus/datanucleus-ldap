@@ -24,10 +24,10 @@ import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.ldap.LDAPUtils;
 import org.datanucleus.store.query.AbstractJPQLQuery;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.inmemory.JPQLInMemoryEvaluator;
 import org.datanucleus.store.query.inmemory.JavaQueryInMemoryEvaluator;
 import org.datanucleus.util.Localiser;
@@ -82,7 +82,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
             startTime = System.currentTimeMillis();
-            NucleusLogger.QUERY.debug(Localiser.msg("021046", Query.LANGUAGE_JPQL, getSingleStringQuery(), null));
+            NucleusLogger.QUERY.debug(Localiser.msg("021046", QueryLanguage.JPQL.name(), getSingleStringQuery(), null));
         }
         List candidates = null;
         if (candidateCollection == null)
@@ -101,7 +101,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(Localiser.msg("021074", Query.LANGUAGE_JPQL, "" + (System.currentTimeMillis() - startTime)));
+            NucleusLogger.QUERY.debug(Localiser.msg("021074", QueryLanguage.JPQL.name(), "" + (System.currentTimeMillis() - startTime)));
         }
 
         if (type == QueryType.BULK_DELETE)
