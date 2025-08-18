@@ -210,7 +210,7 @@ public class QueryToLDAPFilterMapper extends AbstractExpressionEvaluator
         }
         else if (left instanceof PrimaryExpression && right instanceof Number)
         {
-            String param = ((Number) right).toString();
+            String param = right.toString();
             filter = getFilterForPrimaryLiteralValue(operator, (PrimaryExpression) left, param);
             stack.push(filter);
         }
